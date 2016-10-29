@@ -1,0 +1,16 @@
+alias xtime="/usr/local/bin/gtime -f '%Uu %Ss %er %MkB %C' '$@' "
+
+alias setgo15="ln -nfs /usr/local/go_versions/1.5.3 /usr/local/go"
+alias setgo16="ln -nfs /usr/local/go_versions/1.6.2 /usr/local/go"
+alias setgo17="ln -nfs /usr/local/go_versions/1.7.3 /usr/local/go"
+alias setgotip="ln -nfs /usr/local/go_versions/tip /usr/local/go"
+
+alias gocheck="echo 'GO VET SHADOW\n'; go tool vet -shadow=true .;
+echo 'GO VET\n'; go vet ./...;
+echo 'GO HINT'; gohint -config='$GOPATH/gohint.config.json' .;
+echo 'GO TYPE\n'; gotype -a .;
+echo 'GO ERRCHECK\n'; errcheck ./...;
+echo 'GO DEADCODE\n'; deadcode ."
+
+alias goinfo="echo 'GO CYCLO > 10\n'; gocyclo -over 10 ."
+

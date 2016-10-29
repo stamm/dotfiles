@@ -1,0 +1,11 @@
+project_name: Mailer
+project_root: ~/code/go/src/mailer
+windows:
+  - editor:
+    layout: main-vertical
+    panes:
+      - vim
+      - #empty
+  - shell:
+  - k8s status: watch -n2 "kubectl get deploy,po,svc,pvc,pv --show-all"
+  - k8s:
