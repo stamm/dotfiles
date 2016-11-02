@@ -5,7 +5,8 @@ call plug#begin('~/.vim/plugged')
 	Plug 'garyburd/go-explorer'
 	Plug 'Shougo/neocomplete.vim'
 	Plug 'fatih/vim-go', { 'tag': '*' }
-	Plug 'AndrewRadev/splitjoin.vim'
+	Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips'
 	Plug 'fatih/molokai'
 	Plug 'ctrlpvim/ctrlp.vim'
@@ -49,15 +50,15 @@ set virtualedit=all             " allow the cursor to go in to "invalid" places
 
 nnoremap / /\v
 vnoremap / /\v
+nnoremap <silent> <leader>/ :nohlsearch<CR>
 set ignorecase    " ignore case when searching
 set smartcase     " ignore case if search pattern is all lowercase, case-sensitive otherwise
 set gdefault      " replace in all file
 set showmatch     " set show matching parenthesis
 set hlsearch      " highlight search terms
 set incsearch     " show search matches as you type
-nnoremap <silent> <leader>/ :nohlsearch<CR>
-nnoremap <tab> %
-vnoremap <tab> %
+" nnoremap <tab> %
+" vnoremap <tab> %
 " set clipboard=unnamed           " normal OS clipboard interaction
 " Keep search matches in the middle of the window and pulse the line when
 " moving
@@ -118,22 +119,7 @@ inoremap <Down> <nop>
 " nnoremap <c-u> viwU<esc>
 " inoremap <c-u> <esc>viwui
 
-nnoremap <Leader>l :ls<CR>
-nnoremap <Leader>b :bp<CR>
-nnoremap <Leader>f :bn<CR>
-nnoremap <Leader>g :e#<CR>
-nnoremap <Leader>1 :1b<CR>
-nnoremap <Leader>2 :2b<CR>
-nnoremap <Leader>3 :3b<CR>
-nnoremap <Leader>4 :4b<CR>
-nnoremap <Leader>5 :5b<CR>
-nnoremap <Leader>6 :6b<CR>
-nnoremap <Leader>7 :7b<CR>
-nnoremap <Leader>8 :8b<CR>
-nnoremap <Leader>9 :9b<CR>
-nnoremap <Leader>0 :10b<CR>
-
-nnoremap <C-n> :NERDTreeToggle<CR>
+nnoremap <silent> <C-n> :NERDTreeToggle<CR>
 
 nnoremap <leader>' viW<esc>a'<esc>hBi'<esc>lel
 nnoremap <leader>" viW<esc>a"<esc>hBi"<esc>lel
@@ -152,22 +138,22 @@ vnoremap <silent> <leader>x "_x
  
 iabbrev @@ stammru@gmail.com
 
-nnoremap <C-q> :call <SID>QuickfixToggle()<cr>
-
 if executable('ag')
 	let g:ackprg = 'ag --vimgrep'
 " Use ag over grep
 "   set grepprg=ag\ --nogroup\ --nocolor
 
    " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
    " ag is fast enough that CtrlP doesn't need to cache
-   let g:ctrlp_use_caching = 0
+"	let g:ctrlp_use_caching = 0
 endif
-nnoremap <leader>a :Ack! 
-nnoremap <leader>cq :ccl<cr> " close quickfix
-nnoremap <leader>oq :cope<cr> " open quickfix
+" nnoremap <leader>a :Ack! 
+nnoremap <leader>a :Ack "\b<C-R><C-W>\b"<CR>
+
+nnoremap <silent> <leader>cq :ccl<cr> " close quickfix
+nnoremap <silent> <leader>oq :cope<cr> " open quickfix
 
 au FocusLost * :wa
 
@@ -180,19 +166,22 @@ let g:go_highlight_methods = 1
 let g:go_metalinter_autosave = 1
 let g:go_auto_type_info = 1
 let g:go_auto_sameids = 1
- 
+let g:go_list_type = "quickfix" 
+let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
 " Go file settings ---------------------- {{{
 augroup filetype_go
-
+  " autocmd FileType go setlocal nolist
+  autocmd BufNewFile,BufRead *.go setlocal nolist
   autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
-  autocmd BufWritePre *.go Fmt
+  autocmd FileType go nmap <leader>b  <Plug>(go-build)
   autocmd FileType go nmap <leader>r  <Plug>(go-run)
   autocmd FileType go nmap <leader>t  <Plug>(go-test)
   autocmd FileType go nmap <leader>c  <Plug>(go-coverage-toggle)
   autocmd FileType go nmap <leader>im  <Plug>(go-imports)
   autocmd FileType go nmap <leader>l  <Plug>(go-metalinter)
   autocmd FileType go nmap <Leader>i <Plug>(go-info)
-  autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+  " autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+  autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
 augroup END
 " }}}
 
@@ -202,6 +191,12 @@ augroup filetype_vim
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
 " }}}
+
+let g:acp_enableAtStartup = 0
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_auto_select = 0
+set completeopt-=preview
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()

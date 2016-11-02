@@ -95,3 +95,14 @@ source ~/.alias
 
 eval "$(rbenv init -)"
 export PATH=~/.rbenv/shims:$PATH
+
+
+if [[ "$TERM" != "screen-256color" ]]
+then
+	tmuxinator start local
+	exit
+fi
+#powerline_path=$(python -c 'import pkgutil; print pkgutil.get_loader("powerline").filename' 2>/dev/null)
+#if [[ ! -z "$powerline_path" ]]; then
+#	source ${powerline_path}/bindings/zsh/powerline.zsh
+#fi
