@@ -3,16 +3,24 @@ set nocompatible
 call plug#begin('~/.vim/plugged')
 "	Plug 'majutsushi/tagbar'
 	Plug 'garyburd/go-explorer'
-	Plug 'Shougo/neocomplete.vim'
+	"Plug 'Shougo/neocomplete.vim'
+	Plug 'Valloric/YouCompleteMe'
 	Plug 'fatih/vim-go', { 'tag': '*' }
-	Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+	"Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+"	Plug 'nsf/gocode', { 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips'
 	Plug 'fatih/molokai'
 	Plug 'ctrlpvim/ctrlp.vim'
 	Plug 'mileszs/ack.vim'
 	Plug 'scrooloose/nerdtree'
-	Plug 'vim-ctrlspace/vim-ctrlspace'
+	" Plug 'vim-ctrlspace/vim-ctrlspace'
+	Plug 'tpope/vim-fugitive'
+	" Plug 'vim-syntastic/syntastic'
+	Plug 'neomake/neomake'
+	Plug 'bling/vim-airline'
+	Plug 'vim-airline/vim-airline-themes'
+	Plug 'tpope/vim-commentary'
 call plug#end()
 
 " Color schema {{{
@@ -36,7 +44,9 @@ set number
 set cursorline
 set autowrite
 set wrap
+set ruler
 
+set ttyfast
 set hidden
 set tabstop=2
 set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
@@ -91,12 +101,32 @@ set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
 
 set pastetoggle=<F2>
 
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme             = 'molokai'
+let g:airline_powerline_fonts = 1
+let g:airline_inactive_collapse=0
+" let g:airline_section_y=''
+
+
+let g:airline#extensions#virtualenv#enabled = 1
+"let g:airline_exclude_preview = 1
+"let g:airline_left_sep=''
+"let g:airline_right_sep=''
+"let g:airline_section_z=''
+"let g:airline#extensions#tabline#left_sep = ' '
+"let g:airline#extensions#tabline#left_alt_sep = '|'
+
 set laststatus=2
-set statusline=%02n:%m\ %f\ -\ Filetype:%Y%=%l/%L\ %P
+set statusline=%02n:%m\ %f\ -\ Filetype:%Y
+set statusline+=\ %#goStatuslineColor#
+set statusline+=%{go#statusline#Show()}
+set statusline+=%*
+set statusline+=%=%l/%L\ %P
 set cmdheight=2
 
 " Arrows disable {{{
-inoremap jk <esc>
+inoremap jj <esc>
 inoremap <esc> <nop>
 noremap <Up> <nop>
 noremap <Left> <nop>
@@ -118,16 +148,18 @@ inoremap <Down> <nop>
 
 " nnoremap <c-u> viwU<esc>
 " inoremap <c-u> <esc>viwui
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
 
 nnoremap <silent> <C-n> :NERDTreeToggle<CR>
+nnoremap <silent> <F4> :NERDTreeFind<CR>
 
 nnoremap <leader>' viW<esc>a'<esc>hBi'<esc>lel
 nnoremap <leader>" viW<esc>a"<esc>hBi"<esc>lel
 vnoremap <leader>" <esc>`<i"<esc>`>la"<esc>
 vnoremap <leader>' <esc>`<i'<esc>`>la'<esc>
-
-nnoremap <leader>uf ?\(^\\|\s\)func<cr>
-nnoremap <leader>df /\(^\\|\s\)func<cr>
 
 " Use ,d (or ,dd or ,dj or 20,dd) to delete a line without adding it to the
 " yanked stack (also, in visual mode)
@@ -141,47 +173,63 @@ iabbrev @@ stammru@gmail.com
 if executable('ag')
 	let g:ackprg = 'ag --vimgrep'
 " Use ag over grep
-"   set grepprg=ag\ --nogroup\ --nocolor
+   set grepprg=ag\ --nogroup\ --nocolor
 
    " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
 	let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
    " ag is fast enough that CtrlP doesn't need to cache
-"	let g:ctrlp_use_caching = 0
+	let g:ctrlp_use_caching = 0
 endif
+
+nnoremap <NUL> :CtrlPBuffer<cr>
+let g:ctrlp_extensions = ['tag']
+
+let g:ctrlp_buftag_types = {'go': '--languages=Go -R --exclude=vendor .'}
+
+
+cnoreabbrev Ack Ack!
 " nnoremap <leader>a :Ack! 
-nnoremap <leader>a :Ack "\b<C-R><C-W>\b"<CR>
+nnoremap <leader>a :Ack! 
+nnoremap <leader>fw :Ack! "\b<cword>\b"<CR>
+nnoremap <leader>fnt :Ack! "\b<cword>\b" --ignore="*_test.go"<CR>
 
 nnoremap <silent> <leader>cq :ccl<cr> " close quickfix
 nnoremap <silent> <leader>oq :cope<cr> " open quickfix
 
+"nnoremap <silent> <leader>cl :lcl<cr> " close locationlist
+"nnoremap <silent> <leader>ol :lope<cr> " open locationlist
+
 au FocusLost * :wa
 
 let g:go_fmt_command = "goimports"
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_functions = 1
+"let g:go_highlight_types = 1
+" let g:go_highlight_fields = 1
+"let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 "  let g:go_highlight_operators = 1
-let g:go_metalinter_autosave = 1
-let g:go_auto_type_info = 1
-let g:go_auto_sameids = 1
-let g:go_list_type = "quickfix" 
-let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
+let g:go_metalinter_autosave = 0
+" let g:go_auto_type_info = 1
+" let g:go_auto_sameids = 1
+" let g:go_list_type = "quickfix" 
+let g:go_list_type = "locationlist" 
+" let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
+let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+let g:go_gocode_unimported_packages = 1
+let g:go_echo_command_info = 0
 " Go file settings ---------------------- {{{
 augroup filetype_go
-  " autocmd FileType go setlocal nolist
-  autocmd BufNewFile,BufRead *.go setlocal nolist
-  autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
-  autocmd FileType go nmap <leader>b  <Plug>(go-build)
-  autocmd FileType go nmap <leader>r  <Plug>(go-run)
-  autocmd FileType go nmap <leader>t  <Plug>(go-test)
-  autocmd FileType go nmap <leader>c  <Plug>(go-coverage-toggle)
-  autocmd FileType go nmap <leader>im  <Plug>(go-imports)
-  autocmd FileType go nmap <leader>l  <Plug>(go-metalinter)
-  autocmd FileType go nmap <Leader>i <Plug>(go-info)
-  " autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-  autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
+	autocmd BufNewFile,BufRead *.go setlocal nolist noexpandtab tabstop=2 shiftwidth=2
+	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
+	autocmd FileType go nmap <leader>b  <Plug>(go-build)
+	autocmd FileType go nmap <leader>r  <Plug>(go-run)
+	autocmd FileType go nmap <leader>t  <Plug>(go-test)
+	autocmd FileType go nmap <leader>c  <Plug>(go-coverage-toggle)
+	autocmd FileType go nmap <leader>im  <Plug>(go-imports)
+	autocmd FileType go nmap <leader>l  <Plug>(go-metalinter)
+	autocmd FileType go nmap <Leader>i <Plug>(go-info)
+	" autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+	autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
 augroup END
 " }}}
 
@@ -192,11 +240,18 @@ augroup filetype_vim
 augroup END
 " }}}
 
-let g:acp_enableAtStartup = 0
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_auto_select = 0
+let g:acp_enableAtStartup = 1
+"let g:neocomplete#enable_at_startup = 1
+"let g:neocomplete#enable_auto_select = 1
 set completeopt-=preview
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+"" Recommended key-mappings.
+"" <CR>: close popup and save indent.
+"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+"function! s:my_cr_function()
+"    return neocomplete#close_popup() . "\<CR>"
+"endfunction
+"" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
@@ -208,3 +263,28 @@ function! s:build_go_files()
   endif
 endfunction
 
+let g:neomake_open_list = 2
+let g:neomake_go_checkers = ['go', 'golint', 'errcheck']
+let g:neomake_make_maker = {
+        \ 'exe': 'make',
+        \ 'args': ['build'],
+        \ 'errorformat': '%f:%l:%c: %m',
+        \ }
+let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[%tRROR]\ %f:[%l]\ %m,%-G%.%#' }
+
+
+hi NeomakeErrorSign ctermfg=red
+
+
+" syntastic {{{
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
+" 
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 0
+" let g:syntastic_check_on_open = 1
+" let g:syntastic_check_on_wq = 0
+" 
+" let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
+" }}}

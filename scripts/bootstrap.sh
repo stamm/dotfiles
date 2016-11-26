@@ -11,3 +11,5 @@ ln -nfs ~/.dotfiles/.gitconfig ~
 ln -nfs ~/.dotfiles/.gitignore_global ~
 
 ln -nfs ~/.dotfiles/.tmuxinator ~
+
+ln -nfs ~/.dotfiles/.ctags ~
