@@ -1,0 +1,10 @@
+{
+	"package-underscore": false,
+	"elses": false,
+	"bad-receivers": {
+		"me": false,
+		"this": false,
+		"self": false
+	},
+	"ignore-paths": ["vendor\/", ".*_easyjson.go$"]
+}
