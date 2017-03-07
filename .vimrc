@@ -21,6 +21,10 @@ call plug#begin('~/.vim/plugged')
 	Plug 'tpope/vim-commentary'
 	Plug 'mhinz/vim-grepper'
 	Plug 'airblade/vim-gitgutter'
+	Plug 'MattesGroeger/vim-bookmarks'
+
+	" Plug 'tjdevries/nvim-langserver-shim'
+	" Plug 'christoomey/vim-tmux-navigator'
 call plug#end()
 
 " Color schema {{{
@@ -45,6 +49,8 @@ set cursorline
 set autowrite
 set wrap
 set ruler
+set exrc " enable autoload .vimrc in current project
+set secure " Disable autocmd when autoload
 
 set ttyfast
 set hidden
@@ -148,13 +154,29 @@ inoremap <Down> <nop>
 
 " nnoremap <c-u> viwU<esc>
 " inoremap <c-u> <esc>viwui
+
+
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
+" let g:tmux_navigator_no_mappings = 1
+
+" nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+" nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+" nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+" nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+" nnoremap <silent> {Previous-Mapping} :TmuxNavigatePrevious<cr>
+
 nnoremap <silent> <C-n> :NERDTreeToggle<CR>
 nnoremap <silent> <F4> :NERDTreeFind<CR>
+let NERDTreeShowHidden=1
+let NERDTreeMapJumpNextSibling = ''
+let NERDTreeMapJumpPrevSibling = ''
+let NERDTreeAutoDeleteBuffer = 1
+let NERDTreeIgnore=['\.git$[[dir]]', '\.idea$[[dir]]', '\.DS_Store$']
+let NERDTreeMinimalUI=1
 
 nnoremap <leader>' viW<esc>a'<esc>hBi'<esc>lel
 nnoremap <leader>" viW<esc>a"<esc>hBi"<esc>lel
@@ -167,20 +189,23 @@ nnoremap <silent> <leader>d "_d
 vnoremap <silent> <leader>d "_d
 nnoremap <silent> <leader>x "_x
 vnoremap <silent> <leader>x "_x
+xnoremap <leader>p "_dP
 
 iabbrev @@ stammru@gmail.com
 
 if executable('ag')
-	" let g:ackprg = 'ag --vimgrep'
 " Use ag over grep
-	set grepprg=ag\ --nogroup\ --nocolor
+	set grepprg=ag\ --vimgrep
 
 	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
 	let g:ctrlp_user_command = 'ag %s --skip-vcs-ignores -l --nocolor -g ""'
-
-	" ag is fast enough that CtrlP doesn't need to cache
-	let g:ctrlp_use_caching = 0
 endif
+
+" if executable('rg')
+" 	set grepprg=rg\ --color=never
+
+" 	let g:ctrlp_user_command = 'rg %s --no-ignore-vcs --files --color=never -g ""'
+" endif
 
 nnoremap <NUL> :CtrlPBuffer<cr>
 nnoremap <space><space> <c-^>
@@ -196,14 +221,19 @@ let g:ctrlp_prompt_mappings = {
     \ }
 " Set this to 1 to show only MRU files in the current working directory: >
 let g:ctrlp_mruf_relative = 1
-let g:ctrlp_open_single_match   = ['related', 'tags']
+let g:ctrlp_open_single_match = ['related', 'tags']
 let g:ctrlp_by_filename = 1
+let g:ctrlp_use_caching = 1
 
 let g:grepper = {
-  \ 'tools': ['ag', 'rg'],
-  \ 'ag': {
-  \   'grepprg': 'ag -U --vimgrep --nogroup --nocolor',
-  \ }}
+	\ 'tools': ['ag', 'rg'],
+	\ 'rg': {
+	\ 'grepprg': 'rg --no-ignore-vcs --no-heading --color=never --line-number --column --sort-files',
+	\ },
+	\ 'ag': {
+	\   'grepprg': 'ag -U --vimgrep --nogroup --nocolor',
+	\ }}
+" let g:grepper.prompt = 0
 
 " cnoreabbrev Ack Ack!
 " nnoremap <leader>a :Ack!
@@ -213,6 +243,9 @@ let g:grepper = {
 
 nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<cr>g@
 vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<cr>
+nnoremap <leader>* :Grepper -cword -noprompt<cr>
+
+nnoremap <silent> <leader>gg :Grepper<cr>
 
 function! s:AckOperator(type)
 	let saved_unnamed_register = @@
@@ -225,6 +258,7 @@ function! s:AckOperator(type)
 	endif
 
 	execute "Grepper -nojump -tool ag -open -query " . shellescape("\\b" . @@ . "\\b")
+	" execute "Grepper -nojump -tool rg -open -query " . shellescape(@@)
 	copen
 
 	let @@ = saved_unnamed_register
@@ -233,12 +267,13 @@ endfunction
 nnoremap <silent> <leader>cq :ccl<cr> " close quickfix
 nnoremap <silent> <leader>oq :cope<cr> " open quickfix
 
-"nnoremap <silent> <leader>cl :lcl<cr> " close locationlist
-"nnoremap <silent> <leader>ol :lope<cr> " open locationlist
+nnoremap <silent> <leader>cl :lcl<cr> " close locationlist
+nnoremap <silent> <leader>ol :lope<cr> " open locationlist
 
 au FocusLost * :wa
 
 let g:go_fmt_command = "goimports"
+" let g:go_fmt_options = " -local=godep.lzd.co"
 "let g:go_highlight_types = 1
 " let g:go_highlight_fields = 1
 "let g:go_highlight_functions = 1
@@ -250,7 +285,7 @@ let g:go_metalinter_autosave = 0
 " let g:go_list_type = "quickfix"
 let g:go_list_type = "locationlist"
 " let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
-let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+" let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
 let g:go_info_mode = 'guru'
@@ -258,18 +293,24 @@ let g:go_info_mode = 'guru'
 augroup filetype_go
 	autocmd BufNewFile,BufRead *.go setlocal nolist noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
 	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
-	autocmd FileType go nmap <leader>b  <Plug>(go-build)
-	autocmd FileType go nmap <leader>r  <Plug>(go-run)
-	autocmd FileType go nmap <leader>t  <Plug>(go-test)
-	autocmd FileType go nmap <leader>c  <Plug>(go-coverage-toggle)
-	autocmd FileType go nmap <leader>im  <Plug>(go-imports)
-	autocmd FileType go nmap <leader>l  <Plug>(go-metalinter)
-	autocmd FileType go nmap <Leader>i <Plug>(go-info)
+	autocmd FileType go nmap <leader>gb  <Plug>(go-build)
+	autocmd FileType go nmap <leader>gr  <Plug>(go-run)
+	autocmd FileType go nmap <leader>gt  <Plug>(go-test)
+	autocmd FileType go nmap <leader>gc  <Plug>(go-coverage-toggle)
+	autocmd FileType go nmap <leader>gim  <Plug>(go-imports)
+	autocmd FileType go nmap <leader>gl  <Plug>(go-metalinter)
+	autocmd FileType go nmap <Leader>gi <Plug>(go-info)
 	" autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 	autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
 augroup END
 " }}}
 
+" let g:langserver_executables = {
+" 	\ 'go': {
+" 		\ 'name': 'sourcegraph/langserver-go',
+" 		\ 'cmd': ['langserver-go', '-trace', '-logfile', expand('~/Desktop/langserver-go.log')],
+" 	\ },
+" \ }
 " Vimscript file settings ---------------------- {{{
 augroup filetype_vim
 	autocmd!
@@ -304,7 +345,43 @@ function! s:build_go_files()
 endfunction
 
 let g:neomake_open_list = 0
-let g:neomake_go_checkers = ['go', 'golint', 'errcheck']
+
+let g:neomake_go_gohint_maker = {
+	\ 'exe': 'gohint',
+	\ 'args': ['-config=' . $HOME. '/.dotfiles/go/go_hint_config.json'],
+	\ 'errorformat':
+	\ '%W%f:%l:%c: %m,' .
+	\ '%-G%.%#'
+	\ }
+
+let g:neomake_go_errcheckmy_maker = {
+	\ 'exe': 'errcheck',
+	\ 'mapexpr': "getcwd() . '/' . v:val",
+	\ 'errorformat': '%E%f:%l:%c:\ %m,' .
+	\ '%W%f:%l:%c:\ %#%m'
+	\ }
+
+let g:neomake_go_gosimple_maker = {
+	\ 'exe': '/Users/stamm/code/go/src/honnef.co/go/tools/cmd/gosimple/gosimple',
+	\ 'cwd': '%:h',
+	\ 'mapexpr': 'neomake_bufdir . "/" . v:val',
+	\ 'errorformat': '%W%f:%l:%c:\ %#%m'
+	\ }
+
+	" \ 'args': ['--disable-all', '--enable=errcheck', '--enable=gosimple', '--enable=staticcheck', '--enable=unused'],
+let g:neomake_go_gometalinter_maker = {
+	\ 'args': ['--disable-all', '--enable=errcheck', '--enable=gosimple'],
+	\ 'append_file': 0,
+	\ 'cwd': '%:h',
+	\ 'mapexpr': 'neomake_bufdir . "/" . v:val',
+	\ 'errorformat': '%W%f:%l:%c:%m',
+	\ }
+
+" let g:neomake_go_checkers = ['go', 'errcheck']
+" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'errcheckmy', 'gosimple']
+let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'gometalinter']
+" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
+
 let g:neomake_make_maker = {
 	\ 'exe': 'make',
 	\ 'args': ['build'],
@@ -312,14 +389,18 @@ let g:neomake_make_maker = {
 	\ }
 let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[%tRROR]\ %f:[%l]\ %m,%-G%.%#' }
 
+
 hi NeomakeErrorSign ctermfg=red
 
 " let g:ycm_key_list_select_completion = ['<c-n>']
 " let g:ycm_key_list_previous_completion = ['<c-p>']
 let g:UltiSnipsExpandTrigger="<c-e>"
-" let g:UltiSnipsJumpForwardTrigger="<c-b>"
-" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+" bookmarks
+" let g:bookmark_save_per_working_dir = 1
+let g:bookmark_auto_close = 0
 " syntastic {{{
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
