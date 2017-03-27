@@ -1,10 +1,13 @@
-set nocompatible
-
 call plug#begin('~/.vim/plugged')
 "	Plug 'majutsushi/tagbar'
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
-	Plug 'Valloric/YouCompleteMe'
+	if has('nvim')
+		Plug 'Shougo/deoplete.nvim'
+		Plug 'zchee/deoplete-go', { 'do': 'make'}
+	else
+		Plug 'Valloric/YouCompleteMe'
+	endif
 	Plug 'fatih/vim-go', { 'tag': '*' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
@@ -27,6 +30,23 @@ call plug#begin('~/.vim/plugged')
 	" Plug 'christoomey/vim-tmux-navigator'
 call plug#end()
 
+if has('nvim')
+	set mouse=""
+else
+	set nocompatible
+	set ttyfast
+	set autoindent    " always set autoindenting on
+	set backspace=indent,eol,start " allow backspacing over everything in insert mode
+	set history=1000         " remember more commands and search history
+	set hlsearch      " highlight search terms
+	set incsearch     " show search matches as you type
+	set laststatus=2
+	set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
+	set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
+	set undodir=~/.vim/.undo
+	set wildmenu                    " make tab completion for files/buffers act like bash
+endif
+
 " Color schema {{{
 let g:rehash256 = 1
 let g:molokai_original = 1
@@ -44,20 +64,20 @@ nnoremap <silent> <leader>sv :source $MYVIMRC<cr>
 
 set showmode       " always show what mode we're currently editing in
 set relativenumber
-set number
+set number         " Show line numbers
 set cursorline
-set autowrite
-set wrap
+set nocursorcolumn           " speed up syntax highlighting
+set lazyredraw          " Wait to redraw
+set autowrite       " Automatically save before :next, :make etc.
+" set wrap
+se wrap linebreak
+se colorcolumn=120
 set ruler
 set exrc " enable autoload .vimrc in current project
 set secure " Disable autocmd when autoload
 
-set ttyfast
 set hidden
 set tabstop=2
-set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
-set backspace=indent,eol,start " allow backspacing over everything in insert mode
-set autoindent    " always set autoindenting on
 set copyindent    " copy the previous indentation on autoindenting
 set shiftwidth=2  " number of spaces to use for autoindenting
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
@@ -71,69 +91,46 @@ set ignorecase    " ignore case when searching
 set smartcase     " ignore case if search pattern is all lowercase, case-sensitive otherwise
 set gdefault      " replace in all file
 set showmatch     " set show matching parenthesis
-set hlsearch      " highlight search terms
-set incsearch     " show search matches as you type
-" nnoremap <tab> %
-" vnoremap <tab> %
-" set clipboard=unnamed           " normal OS clipboard interaction
-" Keep search matches in the middle of the window and pulse the line when
-" moving
-" to them.
-" nnoremap n n:call PulseCursorLine()<cr>
-" nnoremap N N:call PulseCursorLine()<cr>
-
+set clipboard=unnamed
+" set clipboard^=unnamedplus
 
 set autoread                    " automatically reload files changed outside of Vim
 
 
-set history=1000         " remember more commands and search history
 set undolevels=1000      " use many muchos levels of undo
 set undofile
-set undodir=~/.vim/.undo
-set nobackup
-set noswapfile
+set nobackup             " Don't create annoying backup files
+set noswapfile           " Don't use swapfile
 
-set wildmenu                    " make tab completion for files/buffers act like bash
 set wildmode=list:full          " show a list when pressing tab and complete
 
 set wildignore=*.swp,*.bak,*.pyc,*.class
 set title                " change the terminal's title
 set visualbell           " don't beep
 set noerrorbells         " don't beep
-set showcmd
+set showcmd              " Show me what I'm typing
+set splitright               " Split vertical windows right to the current windows
+set splitbelow               " Split horizontal windows below to the current windows
 
 set list
-set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
 
 set pastetoggle=<F2>
+set diffopt+=vertical    " Always use vertical diffs
 
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme             = 'molokai'
 let g:airline_powerline_fonts = 1
 let g:airline_inactive_collapse=0
-" let g:airline_section_y=''
 
 
 let g:airline#extensions#virtualenv#enabled = 1
-"let g:airline_exclude_preview = 1
-"let g:airline_left_sep=''
-"let g:airline_right_sep=''
-"let g:airline_section_z=''
-"let g:airline#extensions#tabline#left_sep = ' '
-"let g:airline#extensions#tabline#left_alt_sep = '|'
 
-set laststatus=2
-set statusline=%02n:%m\ %f\ -\ Filetype:%Y
-set statusline+=\ %#goStatuslineColor#
-set statusline+=%{go#statusline#Show()}
-set statusline+=%*
-set statusline+=%=%l/%L\ %P
 set cmdheight=2
 
 " Arrows disable {{{
 inoremap jj <esc>
-inoremap <esc> <nop>
+" inoremap <esc> <nop>
 noremap <Up> <nop>
 noremap <Left> <nop>
 noremap <Right> <nop>
@@ -144,22 +141,19 @@ inoremap <Right> <nop>
 inoremap <Down> <nop>
 " }}}
 
-"noremap j gj
-"noremap k gk
-
-
-" noremap <C-n> :cnext<CR>
-" noremap <C-m> :cprevious<CR>
-" nnoremap <leader>a :cclose<CR>
-
-" nnoremap <c-u> viwU<esc>
-" inoremap <c-u> <esc>viwui
-
 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+" Move line(s) of text using Alt+j/k
+"set termencoding=latin1
+nnoremap <silent> <A-j> :m+<CR>==
+nnoremap <silent> <A-k> :m-2<CR>==
+inoremap <silent> <A-j> <Esc>:m+<CR>==gi
+inoremap <silent> <A-k> <Esc>:m-2<CR>==gi
+vnoremap <silent> <A-j> :m'>+<CR>gv=gv
+vnoremap <silent> <A-k> :m-2<CR>gv=gv
 
 " let g:tmux_navigator_no_mappings = 1
 
@@ -207,23 +201,33 @@ endif
 " 	let g:ctrlp_user_command = 'rg %s --no-ignore-vcs --files --color=never -g ""'
 " endif
 
-nnoremap <NUL> :CtrlPBuffer<cr>
+if has('nvim')
+	nnoremap <silent> <C-Space> :CtrlPBuffer<cr>
+else
+	nnoremap <silent> <NUL> :CtrlPBuffer<cr>
+endif
 nnoremap <space><space> <c-^>
 
 " let g:ctrlp_cmd = 'CtrlPMixed'
-let g:ctrlp_extensions = ['tag']
+let g:ctrlp_cmd = 'CtrlPMRU'
 let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_extensions = ['tag']
 let g:ctrlp_buftag_types = {'go': '--languages=Go -R --exclude=vendor .'}
+" let g:ctrlp_buftag_types = {'go' : '--language-force=go --golang-types=ftv'}
 " let g:ctrlp_reuse_window = 'NERD_tree_2'
 let g:ctrlp_prompt_mappings = {
-    \ 'AcceptSelection("e")': ['<cr>', '<c-y>', '<2-LeftMouse>'],
-    \ 'CreateNewFile()':      []
-    \ }
+	\ 'AcceptSelection("e")': ['<cr>', '<c-y>', '<2-LeftMouse>'],
+	\ 'CreateNewFile()':      []
+	\ }
 " Set this to 1 to show only MRU files in the current working directory: >
 let g:ctrlp_mruf_relative = 1
 let g:ctrlp_open_single_match = ['related', 'tags']
-let g:ctrlp_by_filename = 1
+" let g:ctrlp_by_filename = 1
 let g:ctrlp_use_caching = 1
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_mruf_max=450    " number of recent/y opened files
+let g:ctrlp_max_files=0     " do not limit the number of searchable files
+
 
 let g:grepper = {
 	\ 'tools': ['ag', 'rg'],
@@ -235,17 +239,15 @@ let g:grepper = {
 	\ }}
 " let g:grepper.prompt = 0
 
-" cnoreabbrev Ack Ack!
-" nnoremap <leader>a :Ack!
-" nnoremap <leader>a :Ack!
-"nnoremap <leader>fw :Ack! "\b<cword>\b"<CR>
-" nnoremap <leader>fnt :Ack! "\b<cword>\b" --ignore="*_test.go"<CR>
-
 nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<cr>g@
 vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<cr>
 nnoremap <leader>* :Grepper -cword -noprompt<cr>
+nnoremap <leader>nv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
 
 nnoremap <silent> <leader>gg :Grepper<cr>
+nnoremap <silent> <leader>gt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '^.+\_test.go$'<cr>
+nnoremap <silent> <leader>gnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '^.+\_test\.go$'<cr>
+nnoremap <silent> <leader>gnv :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
 
 function! s:AckOperator(type)
 	let saved_unnamed_register = @@
@@ -284,33 +286,27 @@ let g:go_metalinter_autosave = 0
 " let g:go_auto_sameids = 1
 " let g:go_list_type = "quickfix"
 let g:go_list_type = "locationlist"
-" let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
-" let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
 let g:go_info_mode = 'guru'
+" let g:go_def_mode = 'godef'
 " Go file settings ---------------------- {{{
 augroup filetype_go
 	autocmd BufNewFile,BufRead *.go setlocal nolist noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
 	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
-	autocmd FileType go nmap <leader>gb  <Plug>(go-build)
-	autocmd FileType go nmap <leader>gr  <Plug>(go-run)
-	autocmd FileType go nmap <leader>gt  <Plug>(go-test)
-	autocmd FileType go nmap <leader>gc  <Plug>(go-coverage-toggle)
-	autocmd FileType go nmap <leader>gim  <Plug>(go-imports)
-	autocmd FileType go nmap <leader>gl  <Plug>(go-metalinter)
+	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
+	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
+	" autocmd FileType go nmap <leader>gt  <Plug>(go-test)
+	" autocmd FileType go nmap <leader>gc  <Plug>(go-coverage-toggle)
+	" autocmd FileType go nmap <leader>gim  <Plug>(go-imports)
+	" autocmd FileType go nmap <leader>gl  <Plug>(go-metalinter)
 	autocmd FileType go nmap <Leader>gi <Plug>(go-info)
 	" autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 	autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
+	autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 augroup END
 " }}}
 
-" let g:langserver_executables = {
-" 	\ 'go': {
-" 		\ 'name': 'sourcegraph/langserver-go',
-" 		\ 'cmd': ['langserver-go', '-trace', '-logfile', expand('~/Desktop/langserver-go.log')],
-" 	\ },
-" \ }
 " Vimscript file settings ---------------------- {{{
 augroup filetype_vim
 	autocmd!
@@ -320,19 +316,26 @@ augroup END
 
 au BufNewFile,BufRead glide.lock set filetype=yaml
 
-let g:acp_enableAtStartup = 1
-"let g:neocomplete#enable_at_startup = 1
-"let g:neocomplete#enable_auto_select = 1
 set completeopt-=preview
-let g:ycm_min_num_of_chars_for_completion = 1
-"" Recommended key-mappings.
-"" <CR>: close popup and save indent.
-"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-"function! s:my_cr_function()
-"    return neocomplete#close_popup() . "\<CR>"
-"endfunction
-"" <TAB>: completion.
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+set completeopt+=noinsert
+" deoplete.nvim recommend
+set completeopt+=noselect
+if has('nvim')
+	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#auto_complete_start_length = 2
+	let g:deoplete#ignore_sources = {}
+	let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
+	let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+	let g:deoplete#sources#go#align_class = 1
+	let g:deoplete#sources#go#package_dot = 1
+
+	" Use partial fuzzy matches like YouCompleteMe
+	call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
+	call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
+	call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
+else
+	let g:ycm_min_num_of_chars_for_completion = 1
+endif
 
 " run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
@@ -379,8 +382,10 @@ let g:neomake_go_gometalinter_maker = {
 
 " let g:neomake_go_checkers = ['go', 'errcheck']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'errcheckmy', 'gosimple']
-let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'gometalinter']
+" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'gometalinter']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
+" let g:neomake_go_enabled_makers = ['go', 'gohint']
+let g:neomake_go_enabled_makers = ['go']
 
 let g:neomake_make_maker = {
 	\ 'exe': 'make',
@@ -389,29 +394,55 @@ let g:neomake_make_maker = {
 	\ }
 let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[%tRROR]\ %f:[%l]\ %m,%-G%.%#' }
 
-
 hi NeomakeErrorSign ctermfg=red
 
-" let g:ycm_key_list_select_completion = ['<c-n>']
-" let g:ycm_key_list_previous_completion = ['<c-p>']
-let g:UltiSnipsExpandTrigger="<c-e>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" UltiSnips {{{
+
+
+if has('nvim')
+	let g:UltiSnipsExpandTrigger="<tab>"
+	function! g:UltiSnips_Complete()
+		call UltiSnips#ExpandSnippet()
+		if g:ulti_expand_res == 0
+			if pumvisible()
+				return "\<C-n>"
+			else
+				call UltiSnips#JumpForwards()
+				if g:ulti_jump_forwards_res == 0
+					return "\<TAB>"
+				endif
+			endif
+		endif
+		return ""
+	endfunction
+
+	function! g:UltiSnips_Reverse()
+		call UltiSnips#JumpBackwards()
+		if g:ulti_jump_backwards_res == 0
+			return "\<C-P>"
+		endif
+
+		return ""
+	endfunction
+
+	if !exists("g:UltiSnipsJumpForwardTrigger")
+		let g:UltiSnipsJumpForwardTrigger = "<tab>"
+	endif
+
+	if !exists("g:UltiSnipsJumpBackwardTrigger")
+		let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+	endif
+
+
+	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
+else
+	let g:UltiSnipsExpandTrigger="<c-e>"
+	let g:UltiSnipsJumpForwardTrigger="<c-b>"
+	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+endif
+" }}}
 
 " bookmarks
 " let g:bookmark_save_per_working_dir = 1
 let g:bookmark_auto_close = 0
-" syntastic {{{
-" set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-" set statusline+=%*
-"
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 0
-" let g:syntastic_check_on_open = 1
-" let g:syntastic_check_on_wq = 0
-"
-" let g:syntastic_go_checkers = ['go', 'golint', 'errcheck']
-" }}}
-
-
