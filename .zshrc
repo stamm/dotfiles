@@ -6,6 +6,7 @@ export ZSH=/Users/stamm/.oh-my-zsh
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
 ZSH_THEME="robbyrussell"
+# ZSH_THEME="random"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -49,8 +50,10 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-#plugins=(git)
-
+# plugins=(git docker-compose docker golang)
+plugins=(command-time zsh-autosuggestions zsh-syntax-highlighting)
+ZSH_COMMAND_TIME_MIN_SECONDS=3
+ZSH_COMMAND_TIME_ECHO=""
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -88,6 +91,7 @@ source '/Users/stamm/Downloads/google-cloud-sdk/path.zsh.inc'
 # The next line enables shell command completion for gcloud.
 source '/Users/stamm/Downloads/google-cloud-sdk/completion.zsh.inc'
 
+setopt auto_list
 source <(kubectl completion zsh)
 
 source ~/.env
@@ -95,7 +99,6 @@ source ~/.alias
 
 eval "$(rbenv init -)"
 export PATH=~/.rbenv/shims:$PATH
-
 
 if [[ "$TERM" != "screen-256color" ]]
 then
@@ -106,3 +109,6 @@ fi
 #if [[ ! -z "$powerline_path" ]]; then
 #	source ${powerline_path}/bindings/zsh/powerline.zsh
 #fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+eval "$(direnv hook zsh)"
