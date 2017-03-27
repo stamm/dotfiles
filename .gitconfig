@@ -5,6 +5,7 @@
 [core]
 	excludesfile = /Users/stamm/.gitignore_global
 	autocrlf = input
+	pager = less -x2
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
@@ -13,3 +14,6 @@
 	trustExitCode = true
 [push]
 	default = simple
+[alias]
+	s = status -sb
+	ds = diff --staged
