@@ -208,8 +208,8 @@ else
 endif
 nnoremap <space><space> <c-^>
 
-" let g:ctrlp_cmd = 'CtrlPMixed'
-let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_cmd = 'CtrlPMixed'
+" let g:ctrlp_cmd = 'CtrlPMRU'
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_extensions = ['tag']
 let g:ctrlp_buftag_types = {'go': '--languages=Go -R --exclude=vendor .'}
@@ -241,8 +241,8 @@ let g:grepper = {
 
 nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<cr>g@
 vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<cr>
-nnoremap <leader>* :Grepper -cword -noprompt<cr>
-nnoremap <leader>nv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
+nnoremap <leader>g* :Grepper -cword -noprompt<cr>
+nnoremap <leader>gnv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
 
 nnoremap <silent> <leader>gg :Grepper<cr>
 nnoremap <silent> <leader>gt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '^.+\_test.go$'<cr>
@@ -289,10 +289,10 @@ let g:go_list_type = "locationlist"
 let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
 let g:go_info_mode = 'guru'
-" let g:go_def_mode = 'godef'
+let g:go_def_mode = 'godef'
 " Go file settings ---------------------- {{{
 augroup filetype_go
-	autocmd BufNewFile,BufRead *.go setlocal nolist noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
 	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
@@ -328,6 +328,7 @@ if has('nvim')
 	let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 	let g:deoplete#sources#go#align_class = 1
 	let g:deoplete#sources#go#package_dot = 1
+	" call deoplete#enable_logging('DEBUG', '/tmp/deoplete.log')
 
 	" Use partial fuzzy matches like YouCompleteMe
 	call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
@@ -386,6 +387,7 @@ let g:neomake_go_gometalinter_maker = {
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
 " let g:neomake_go_enabled_makers = ['go', 'gohint']
 let g:neomake_go_enabled_makers = ['go']
+" let g:neomake_go_enabled_makers = []
 
 let g:neomake_make_maker = {
 	\ 'exe': 'make',
