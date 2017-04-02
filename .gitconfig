@@ -16,4 +16,4 @@
 	default = simple
 [alias]
 	s = status -sb
-	ds = diff --staged
+	ds = diff --staged --word-diff=color
