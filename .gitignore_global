@@ -5,3 +5,8 @@
 # Direnv stuff
 .direnv
 .envrc
+
+
+# ag ignore
+.ignore
+tags
