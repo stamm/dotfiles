@@ -3,7 +3,7 @@ call plug#begin('~/.vim/plugged')
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
-		Plug 'Shougo/deoplete.nvim'
+		Plug 'Shougo/deoplete.nvim', { 'tag': '*' }
 		Plug 'zchee/deoplete-go', { 'do': 'make'}
 	else
 		Plug 'Valloric/YouCompleteMe'
@@ -12,7 +12,7 @@ call plug#begin('~/.vim/plugged')
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
 	Plug 'fatih/molokai'
-	Plug 'ctrlpvim/ctrlp.vim'
+	Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
 	" Plug 'mileszs/ack.vim'
 	Plug 'scrooloose/nerdtree'
 	" Plug 'vim-ctrlspace/vim-ctrlspace'
@@ -49,7 +49,7 @@ endif
 
 " Color schema {{{
 let g:rehash256 = 1
-let g:molokai_original = 1
+" let g:molokai_original = 1
 colorscheme molokai
 " }}}
 
@@ -118,13 +118,21 @@ set pastetoggle=<F2>
 set diffopt+=vertical    " Always use vertical diffs
 
 
-let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 0
 let g:airline_theme             = 'molokai'
 let g:airline_powerline_fonts = 1
-let g:airline_inactive_collapse=0
+let g:airline_inactive_collapse=1
 
 
-let g:airline#extensions#virtualenv#enabled = 1
+let g:airline#extensions#virtualenv#enabled = 0
+
+" let g:airline_section_x = '%#goStatuslineColor#%{go#statusline#Show()}%*'
+let g:airline_section_y = '%{go#statusline#Show()}'
+if !exists('g:airline_symbols')
+	let g:airline_symbols = {}
+endif
+let g:airline_symbols.linenr = ''
+let g:airline_symbols.maxlinenr = ''
 
 set cmdheight=2
 
@@ -212,7 +220,7 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 " let g:ctrlp_cmd = 'CtrlPMRU'
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_extensions = ['tag']
-let g:ctrlp_buftag_types = {'go': '--languages=Go -R --exclude=vendor .'}
+let g:ctrlp_buftag_types = {'go': '--languages=Go -R --exclude=vendor --exclude=static .'}
 " let g:ctrlp_buftag_types = {'go' : '--language-force=go --golang-types=ftv'}
 " let g:ctrlp_reuse_window = 'NERD_tree_2'
 let g:ctrlp_prompt_mappings = {
@@ -239,15 +247,16 @@ let g:grepper = {
 	\ }}
 " let g:grepper.prompt = 0
 
-nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<cr>g@
-vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<cr>
-nnoremap <leader>g* :Grepper -cword -noprompt<cr>
-nnoremap <leader>gnv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
+nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<Enter>g@
+vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<Enter>
 
-nnoremap <silent> <leader>gg :Grepper<cr>
-nnoremap <silent> <leader>gt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '^.+\_test.go$'<cr>
-nnoremap <silent> <leader>gnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '^.+\_test\.go$'<cr>
-nnoremap <silent> <leader>gnv :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<cr>
+nnoremap <leader>f* :Grepper -cword -noprompt<Enter>
+nnoremap <leader>fnv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
+
+nnoremap <silent> <leader>ff :Grepper<Enter>
+nnoremap <silent> <leader>ft :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '^.+\_test.go$'<Enter>
+nnoremap <silent> <leader>fnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '^.+\_test\.go$'<Enter>
+nnoremap <silent> <leader>fnv :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
 
 function! s:AckOperator(type)
 	let saved_unnamed_register = @@
@@ -296,8 +305,8 @@ augroup filetype_go
 	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
-	" autocmd FileType go nmap <leader>gt  <Plug>(go-test)
-	" autocmd FileType go nmap <leader>gc  <Plug>(go-coverage-toggle)
+	autocmd FileType go nmap <leader>gt  <Plug>(go-test)
+	autocmd FileType go nmap <leader>gc  <Plug>(go-coverage-toggle)
 	" autocmd FileType go nmap <leader>gim  <Plug>(go-imports)
 	" autocmd FileType go nmap <leader>gl  <Plug>(go-metalinter)
 	autocmd FileType go nmap <Leader>gi <Plug>(go-info)
