@@ -10,3 +10,7 @@
 # ag ignore
 .ignore
 tags
+
+
+# vim
+.exrc
