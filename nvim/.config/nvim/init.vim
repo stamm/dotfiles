@@ -1,4 +1,4 @@
-call plug#begin('~/.vim/plugged')
+call plug#begin()
 "	Plug 'majutsushi/tagbar'
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
@@ -43,7 +43,7 @@ else
 	set laststatus=2
 	set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
 	set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
-	set undodir=~/.vim/.undo
+	set undodir=~/.config/nvim/.undo
 	set wildmenu                    " make tab completion for files/buffers act like bash
 endif
 

@@ -1,0 +1,1 @@
+/Users/stamm/.config/fisherman/await/functions/await.fish

@@ -1,0 +1,1 @@
+/Users/stamm/.config/fisherman/get/completions/get.fish
