@@ -163,6 +163,8 @@ inoremap <silent> <A-k> <Esc>:m-2<CR>==gi
 vnoremap <silent> <A-j> :m'>+<CR>gv=gv
 vnoremap <silent> <A-k> :m-2<CR>gv=gv
 
+nnoremap <leader>w :wa<CR>
+
 " let g:tmux_navigator_no_mappings = 1
 
 " nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
