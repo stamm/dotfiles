@@ -1,7 +1,6 @@
 [user]
 	name = Rustam Zagirov
-	email = rustam.zagirov@lazada.com
-#  email = stammru@gmail.com
+  email = stammru@gmail.com
 [core]
 	excludesfile = /Users/stamm/.gitignore_global
 	autocrlf = input
