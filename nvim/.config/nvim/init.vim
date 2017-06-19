@@ -3,7 +3,7 @@ call plug#begin()
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
-		Plug 'Shougo/deoplete.nvim', { 'tag': '*' }
+		Plug 'Shougo/deoplete.nvim', { 'tag': '*', 'do': ':UpdateRemotePlugins' }
 		Plug 'zchee/deoplete-go', { 'do': 'make'}
 	else
 		Plug 'Valloric/YouCompleteMe'
@@ -17,7 +17,6 @@ call plug#begin()
 	Plug 'scrooloose/nerdtree'
 	" Plug 'vim-ctrlspace/vim-ctrlspace'
 	Plug 'tpope/vim-fugitive'
-	" Plug 'vim-syntastic/syntastic'
 	Plug 'neomake/neomake'
 	Plug 'bling/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
@@ -26,9 +25,18 @@ call plug#begin()
 	Plug 'airblade/vim-gitgutter'
 	Plug 'MattesGroeger/vim-bookmarks'
 
+	" if has('nvim')
+	" 	Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+	" endif
 	" Plug 'tjdevries/nvim-langserver-shim'
+	" Plug 'Shougo/echodoc.vim'
 	" Plug 'christoomey/vim-tmux-navigator'
+	"
+
+	Plug 'tpope/vim-rails'
+	Plug 'tpope/vim-bundler'
 call plug#end()
+
 
 if has('nvim')
 	set mouse=""
@@ -299,12 +307,13 @@ let g:go_metalinter_autosave = 0
 let g:go_list_type = "locationlist"
 let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
-let g:go_info_mode = 'guru'
+let g:go_info_mode = 'gocode'
 let g:go_def_mode = 'godef'
 " Go file settings ---------------------- {{{
 augroup filetype_go
+	au!
 	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
-	autocmd BufWritePost,BufNewFile,BufRead *.go Neomake
+	autocmd BufWritePost,BufNewFile,BufReadPost *.go Neomake
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
 	autocmd FileType go nmap <leader>gt  <Plug>(go-test)
@@ -315,17 +324,20 @@ augroup filetype_go
 	" autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 	autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
 	autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+
+	autocmd BufNewFile,BufRead glide.lock set filetype=yaml
+	autocmd BufEnter glide.yaml command! -bang A edit glide.lock
+	autocmd BufEnter glide.lock command! -bang A edit glide.yaml
 augroup END
 " }}}
 
 " Vimscript file settings ---------------------- {{{
 augroup filetype_vim
-	autocmd!
+	au!
 	autocmd FileType vim setlocal foldmethod=marker
 augroup END
 " }}}
 
-au BufNewFile,BufRead glide.lock set filetype=yaml
 
 set completeopt-=preview
 set completeopt+=noinsert
@@ -360,6 +372,7 @@ function! s:build_go_files()
 endfunction
 
 let g:neomake_open_list = 0
+" let g:neomake_highlight_lines = 1
 
 let g:neomake_go_gohint_maker = {
 	\ 'exe': 'gohint',
@@ -407,7 +420,21 @@ let g:neomake_make_maker = {
 	\ }
 let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[%tRROR]\ %f:[%l]\ %m,%-G%.%#' }
 
+hi link NeomakeError SpellBad
+hi link NeomakeWarning SpellCap
 hi NeomakeErrorSign ctermfg=red
+
+function! NeomakeTestJobInit(context) abort
+  if type(a:context.argv) == type([])
+    let a:context.argv = ['nice', '-n18'] + a:context.argv
+  else
+    let a:context.argv = 'nice -n 18 '.a:context.argv
+  endif
+endfunction
+
+augroup neomake_tests
+  au User NeomakeJobInit call NeomakeTestJobInit(g:neomake_hook_context)
+augroup END
 
 " UltiSnips {{{
 
@@ -459,3 +486,18 @@ endif
 " bookmarks
 " let g:bookmark_save_per_working_dir = 1
 let g:bookmark_auto_close = 0
+
+" let g:LanguageClient_serverCommands = {
+"     \ 'go': ['go-langserver'],
+"     \ }
+
+" " Automatically start language servers.
+" let g:LanguageClient_autoStart = 1
+"
+" Ruby {{{
+augroup filetype_ruby
+	au!
+	autocmd BufNewFile,BufRead *.rb,Gemfile setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+augroup END
+" }}}
+
