@@ -1,8 +1,10 @@
 [user]
 	name = Rustam Zagirov
-  email = stammru@gmail.com
+	email = rustam.zagirov@lazada.com
+[includeIf "gitdir:~/code/go_api/"]
+  path = config-work
 [core]
-	excludesfile = /Users/stamm/.gitignore_global
+	excludesfile = /Users/stamm/.config/git/ignore
 	autocrlf = input
 	pager = less -x2
 [difftool "sourcetree"]
@@ -16,3 +18,5 @@
 [alias]
 	s = status -sb
 	ds = diff --staged --word-diff=color
+[commit]
+	template = /Users/stamm/.stCommitMsg
