@@ -1,8 +1,11 @@
 [user]
 	name = Rustam Zagirov
-	email = rustam.zagirov@lazada.com
+	email = stammru@gmail.com
+	signingkey = 809B393BBA188BCA
 [includeIf "gitdir:~/code/go_api/"]
-  path = config-work
+	path = config-work
+[includeIf "gitdir:~/code/java/"]
+	path = config-work
 [core]
 	excludesfile = /Users/stamm/.config/git/ignore
 	autocrlf = input

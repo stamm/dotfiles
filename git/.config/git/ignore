@@ -3,14 +3,14 @@
 .idea
 
 # Direnv stuff
-.direnv
-.envrc
+/.direnv
+/.envrc
 
 
 # ag ignore
-.ignore
-tags
+/.ignore
+/tags
 
 
 # vim
-.exrc
+/.exrc
