@@ -13,6 +13,8 @@ call plug#begin()
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
 	Plug 'fatih/molokai'
 	Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
+	Plug '/usr/local/opt/fzf'
+	Plug 'junegunn/fzf.vim'
 	" Plug 'mileszs/ack.vim'
 	Plug 'scrooloose/nerdtree'
 	" Plug 'vim-ctrlspace/vim-ctrlspace'
@@ -35,6 +37,7 @@ call plug#begin()
 
 	Plug 'tpope/vim-rails'
 	Plug 'tpope/vim-bundler'
+	Plug 'artur-shaik/vim-javacomplete2'
 call plug#end()
 
 
@@ -64,8 +67,8 @@ colorscheme molokai
 let mapleader = ","
 let maplocalleader = ",,"
 
-nnoremap : ;
-nnoremap ; :
+" nnoremap : ;
+" nnoremap ; :
 
 nnoremap <silent> <leader>ev :e $MYVIMRC<cr>
 nnoremap <silent> <leader>sv :source $MYVIMRC<cr>
@@ -108,7 +111,8 @@ set autoread                    " automatically reload files changed outside of 
 set undolevels=1000      " use many muchos levels of undo
 set undofile
 set nobackup             " Don't create annoying backup files
-set noswapfile           " Don't use swapfile
+" set noswapfile           " Don't use swapfile
+set dir=~/.config/nvim/.swapfiles//
 
 set wildmode=list:full          " show a list when pressing tab and complete
 
@@ -262,11 +266,13 @@ vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<Enter>
 
 nnoremap <leader>f* :Grepper -cword -noprompt<Enter>
 nnoremap <leader>fnv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
+nnoremap <leader>fnvt* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
 
 nnoremap <silent> <leader>ff :Grepper<Enter>
-nnoremap <silent> <leader>ft :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '^.+\_test.go$'<Enter>
-nnoremap <silent> <leader>fnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '^.+\_test\.go$'<Enter>
+nnoremap <silent> <leader>ft :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '*_test.go'<Enter>
+nnoremap <silent> <leader>fnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '*_test.go'<Enter>
 nnoremap <silent> <leader>fnv :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
+nnoremap <silent> <leader>fnvt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
 
 function! s:AckOperator(type)
 	let saved_unnamed_register = @@
@@ -295,11 +301,11 @@ au FocusLost * :wa
 
 let g:go_fmt_command = "goimports"
 " let g:go_fmt_options = " -local=godep.lzd.co"
-"let g:go_highlight_types = 1
+let g:go_highlight_types = 1
 " let g:go_highlight_fields = 1
 "let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
-"  let g:go_highlight_operators = 1
+let g:go_highlight_operators = 1
 let g:go_metalinter_autosave = 0
 " let g:go_auto_type_info = 1
 " let g:go_auto_sameids = 1
@@ -328,6 +334,8 @@ augroup filetype_go
 	autocmd BufNewFile,BufRead glide.lock set filetype=yaml
 	autocmd BufEnter glide.yaml command! -bang A edit glide.lock
 	autocmd BufEnter glide.lock command! -bang A edit glide.yaml
+	autocmd BufEnter Gopkg.toml command! -bang A edit Gopkg.lock
+	autocmd BufEnter Gopkg.lock command! -bang A edit Gopkg.toml
 augroup END
 " }}}
 
@@ -408,9 +416,9 @@ let g:neomake_go_gometalinter_maker = {
 " let g:neomake_go_checkers = ['go', 'errcheck']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'errcheckmy', 'gosimple']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'gometalinter']
-" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
-" let g:neomake_go_enabled_makers = ['go', 'gohint']
-let g:neomake_go_enabled_makers = ['go']
+let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
+" let g:neomake_go_enabled_makers = ['go', 'gohint', 'errcheck']
+" let g:neomake_go_enabled_makers = ['go']
 " let g:neomake_go_enabled_makers = []
 
 let g:neomake_make_maker = {
@@ -423,18 +431,6 @@ let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[
 hi link NeomakeError SpellBad
 hi link NeomakeWarning SpellCap
 hi NeomakeErrorSign ctermfg=red
-
-function! NeomakeTestJobInit(context) abort
-  if type(a:context.argv) == type([])
-    let a:context.argv = ['nice', '-n18'] + a:context.argv
-  else
-    let a:context.argv = 'nice -n 18 '.a:context.argv
-  endif
-endfunction
-
-augroup neomake_tests
-  au User NeomakeJobInit call NeomakeTestJobInit(g:neomake_hook_context)
-augroup END
 
 " UltiSnips {{{
 
@@ -486,7 +482,9 @@ endif
 " bookmarks
 " let g:bookmark_save_per_working_dir = 1
 let g:bookmark_auto_close = 0
-
+let g:bookmark_no_default_key_mappings = 1
+nmap <Leader>mm <Plug>BookmarkToggle
+nmap <Leader>ma <Plug>BookmarkShowAll
 " let g:LanguageClient_serverCommands = {
 "     \ 'go': ['go-langserver'],
 "     \ }
@@ -501,3 +499,11 @@ augroup filetype_ruby
 augroup END
 " }}}
 
+
+
+" Java {{{
+augroup filetype_java
+	au!
+	autocmd FileType java setlocal omnifunc=javacomplete#Complete
+augroup END
+" }}}
