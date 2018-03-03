@@ -52,8 +52,10 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 # plugins=(git docker-compose docker golang)
 plugins=(command-time zsh-autosuggestions zsh-syntax-highlighting)
+# plugins=(command-time zsh-syntax-highlighting)
 ZSH_COMMAND_TIME_MIN_SECONDS=3
-ZSH_COMMAND_TIME_ECHO=""
+ZSH_COMMAND_TIME_ECHO=1
+ZSH_HIGHLIGHT_MAXLENGTH=50
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"

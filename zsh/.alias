@@ -1,13 +1,20 @@
 alias xtime="/usr/local/bin/gtime -f '%Uu %Ss %er %MkB %C' '$@' "
 
 alias vim="nvim"
+alias k="kubectl"
+alias kcd='kubectl config set-context $(kubectl config current-context) --namespace '
+alias ...="cd ../.."
+alias ....="cd ../../.."
 
-alias setgo15="ln -nfs /usr/local/go_versions/1.5.3 /usr/local/go"
-alias setgo16="ln -nfs /usr/local/go_versions/1.6.4 /usr/local/go"
-alias setgo17="ln -nfs /usr/local/go_versions/1.7.5 /usr/local/go"
-alias setgo18="ln -nfs /usr/local/go_versions/1.8.3 /usr/local/go"
-alias setgo19="ln -nfs /usr/local/go_versions/1.9beta2 /usr/local/go"
-alias setgotip="ln -nfs /usr/local/go_versions/tip /usr/local/go"
+
+alias setgo15="ln -nfs /usr/local/go_versions/1.5.3 /usr/local/go_versions/current"
+alias setgo16="ln -nfs /usr/local/go_versions/1.6.4 /usr/local/go_versions/current"
+alias setgo17="ln -nfs /usr/local/go_versions/1.7.6 /usr/local/go_versions/current"
+alias setgo18="ln -nfs /usr/local/go_versions/1.8.7 /usr/local/go_versions/current"
+alias setgo19="ln -nfs /usr/local/go_versions/1.9.4 /usr/local/go_versions/current"
+alias setgo110="ln -nfs /usr/local/go_versions/1.10 /usr/local/go_versions/current"
+# abbr -a setgo110 "ln -nfs /usr/local/go_versions/1.10rc2 /usr/local/go_versions/current"
+alias setgotip="ln -nfs /usr/local/go_versions/tip /usr/local/go_versions/current"
 
 alias gocheck="echo 'GO VET SHADOW\n'; go tool vet -shadow=true .;
 echo 'GO VET\n'; go vet ./...;
