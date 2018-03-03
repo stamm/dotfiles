@@ -5,7 +5,7 @@ set -x LC_ALL en_US.UTF-8
 #export LANG=C
 
 set -x GOPATH $HOME/code/go
-set -x GOROOT /usr/local/go
+set -x GOROOT /usr/local/go_versions/current
 set -x GO15VENDOREXPERIMENT 1
 
 set CDPATH . $GOPATH/src
@@ -20,6 +20,26 @@ set -x GOOGLE_APPLICATION_CREDENTIALS /Users/stamm/.config/gcloud/application_de
 
 set PATH ~/.rbenv/shims $PATH
 # status --is-interactive; and source (rbenv init -|psub)
+
+set GPG_TTY (tty)
+
+abbr --add vim "nvim"
+abbr --add k "kubectl"
+abbr --add kcd 'kubectl config set-context (kubectl config current-context) --namespace '
+
+
+abbr --add setgo15 "ln -nfs /usr/local/go_versions/1.5.3 /usr/local/go_versions/current"
+abbr --add setgo16 "ln -nfs /usr/local/go_versions/1.6.4 /usr/local/go_versions/current"
+abbr --add setgo17 "ln -nfs /usr/local/go_versions/1.7.5 /usr/local/go_versions/current"
+abbr --add setgo18 "ln -nfs /usr/local/go_versions/1.8.5 /usr/local/go_versions/current"
+abbr --add setgo19 "ln -nfs /usr/local/go_versions/1.9.2 /usr/local/go_versions/current"
+abbr --add setgo110 "ln -nfs /usr/local/go_versions/1.10beta1 /usr/local/go_versions/current"
+abbr --add setgotip "ln -nfs /usr/local/go_versions/tip /usr/local/go_versions/current"
+
+
+
+
+
 
 
 if [ -z "$TMUX" ]
