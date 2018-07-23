@@ -4,7 +4,7 @@ set -x LC_ALL en_US.UTF-8
 #export LC_ALL=en_US.UTF-8
 #export LANG=C
 
-set -x GOPATH $HOME/go
+set -x GOPATH $HOME/code/go
 set -x GOROOT /usr/local/go_versions/current
 set -x GO15VENDOREXPERIMENT 1
 
@@ -14,7 +14,7 @@ set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 # /opt/X11/bin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
-set PATH $HOME/.cargo/bin $PATH
+#set PATH $HOME/.cargo/bin $PATH
 set PAGER "most"
 
 set -x EDITOR nvim
@@ -57,8 +57,6 @@ if [ -z "$TMUX" ]
 	set -x TERM xterm-256color
 end
 
-if [ "$TERM" != "screen-255color" ]
-	eval (command tmuxinator start local)
-end
+tmux attach -t base; or tmux new -s base
 
 
