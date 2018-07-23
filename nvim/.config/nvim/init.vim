@@ -1,4 +1,4 @@
-call plug#begin()
+call plug#begin('~/.config/nvim/plugged/')
 "	Plug 'majutsushi/tagbar'
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
