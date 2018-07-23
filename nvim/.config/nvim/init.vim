@@ -54,9 +54,9 @@ else
 	set laststatus=2
 	set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
 	set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
-	set undodir=~/.config/nvim/.undo
 	set wildmenu                    " make tab completion for files/buffers act like bash
 endif
+set undodir=~/.config/nvim/.undo
 
 " Color schema {{{
 let g:rehash256 = 1
