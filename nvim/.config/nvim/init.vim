@@ -1,14 +1,20 @@
 call plug#begin()
 "	Plug 'majutsushi/tagbar'
+	Plug 'ervandew/supertab'
 	Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
+		Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
 		Plug 'Shougo/deoplete.nvim', { 'tag': '*', 'do': ':UpdateRemotePlugins' }
 		Plug 'zchee/deoplete-go', { 'do': 'make'}
 	else
 		Plug 'Valloric/YouCompleteMe'
 	endif
-	Plug 'fatih/vim-go', { 'tag': '*' }
+	Plug 'fatih/vim-go', { 'branch': 'gocode-change', 'do': ':GoUpdateBinaries' }
+	", { 'tag': '*' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
 	Plug 'fatih/molokai'
@@ -37,8 +43,14 @@ call plug#begin()
 
 	Plug 'tpope/vim-rails'
 	Plug 'tpope/vim-bundler'
-	Plug 'artur-shaik/vim-javacomplete2'
 call plug#end()
+
+" let g:python2_host_prog = '/usr/local/bin/python'
+let g:python2_host_prog = '/usr/bin/python'
+let g:python3_host_prog = '/usr/local/bin/python3'
+" Skip the check of neovim module
+let g:python3_host_skip_check = 1
+
 
 
 if has('nvim')
@@ -186,7 +198,7 @@ nnoremap <leader>w :wa<CR>
 " nnoremap <silent> {Previous-Mapping} :TmuxNavigatePrevious<cr>
 
 nnoremap <silent> <C-n> :NERDTreeToggle<CR>
-nnoremap <silent> <F4> :NERDTreeFind<CR>
+nnoremap <silent> <C-s> :NERDTreeFind<CR>
 let NERDTreeShowHidden=1
 let NERDTreeMapJumpNextSibling = ''
 let NERDTreeMapJumpPrevSibling = ''
@@ -360,6 +372,7 @@ if has('nvim')
 	let g:deoplete#sources#go#align_class = 1
 	let g:deoplete#sources#go#package_dot = 1
 	" call deoplete#enable_logging('DEBUG', '/tmp/deoplete.log')
+	" let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode_old'
 
 	" Use partial fuzzy matches like YouCompleteMe
 	call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
@@ -433,50 +446,53 @@ hi link NeomakeWarning SpellCap
 hi NeomakeErrorSign ctermfg=red
 
 " UltiSnips {{{
+let g:UltiSnipsExpandTrigger = "<c-e>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:UltiSnipsUsePythonVersion = 3
+
+" if has('nvim')
+" 	let g:UltiSnipsExpandTrigger="<tab>"
+" 	function! g:UltiSnips_Complete()
+" 		call UltiSnips#ExpandSnippet()
+" 		if g:ulti_expand_res == 0
+" 			if pumvisible()
+" 				return "\<C-n>"
+" 			else
+" 				call UltiSnips#JumpForwards()
+" 				if g:ulti_jump_forwards_res == 0
+" 					return "\<TAB>"
+" 				endif
+" 			endif
+" 		endif
+" 		return ""
+" 	endfunction
+
+" 	function! g:UltiSnips_Reverse()
+" 		call UltiSnips#JumpBackwards()
+" 		if g:ulti_jump_backwards_res == 0
+" 			return "\<C-P>"
+" 		endif
+
+" 		return ""
+" 	endfunction
+
+" 	if !exists("g:UltiSnipsJumpForwardTrigger")
+" 		let g:UltiSnipsJumpForwardTrigger = "<tab>"
+" 	endif
+
+" 	if !exists("g:UltiSnipsJumpBackwardTrigger")
+" 		let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" 	endif
 
 
-if has('nvim')
-	let g:UltiSnipsExpandTrigger="<tab>"
-	function! g:UltiSnips_Complete()
-		call UltiSnips#ExpandSnippet()
-		if g:ulti_expand_res == 0
-			if pumvisible()
-				return "\<C-n>"
-			else
-				call UltiSnips#JumpForwards()
-				if g:ulti_jump_forwards_res == 0
-					return "\<TAB>"
-				endif
-			endif
-		endif
-		return ""
-	endfunction
-
-	function! g:UltiSnips_Reverse()
-		call UltiSnips#JumpBackwards()
-		if g:ulti_jump_backwards_res == 0
-			return "\<C-P>"
-		endif
-
-		return ""
-	endfunction
-
-	if !exists("g:UltiSnipsJumpForwardTrigger")
-		let g:UltiSnipsJumpForwardTrigger = "<tab>"
-	endif
-
-	if !exists("g:UltiSnipsJumpBackwardTrigger")
-		let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-	endif
-
-
-	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
-else
-	let g:UltiSnipsExpandTrigger="<c-e>"
-	let g:UltiSnipsJumpForwardTrigger="<c-b>"
-	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-endif
+" 	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+" 	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
+" else
+" 	let g:UltiSnipsExpandTrigger="<c-e>"
+" 	let g:UltiSnipsJumpForwardTrigger="<c-b>"
+" 	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" endif
 " }}}
 
 " bookmarks
