@@ -1,3 +1,7 @@
 [user]
 	name = Rustam Zagirov
-	email = rustam.zagirov@lazada.com
+	email = rzagirov@ozon.ru
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[url "git@gitlab.ozon.ru:"]
+	insteadOf = https://gitlab.ozon.ru/

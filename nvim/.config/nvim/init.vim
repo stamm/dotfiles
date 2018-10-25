@@ -142,6 +142,8 @@ set list
 set pastetoggle=<F2>
 set diffopt+=vertical    " Always use vertical diffs
 
+set maxmempattern=100000
+
 
 let g:airline#extensions#tabline#enabled = 0
 let g:airline_theme             = 'molokai'
@@ -429,7 +431,7 @@ let g:neomake_go_gometalinter_maker = {
 
 " let g:neomake_go_checkers = ['go', 'errcheck']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'errcheckmy', 'gosimple']
-" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'gometalinter']
+" let g:neomake_go_enabled_makers = ['gometalinter']
 let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
 " let g:neomake_go_enabled_makers = ['go', 'gohint', 'errcheck']
 " let g:neomake_go_enabled_makers = ['go']

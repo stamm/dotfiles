@@ -17,9 +17,15 @@ function kubectl_status
   set -l color_k8s white
   set -l color_k8s_icon cyan
   switch $ctx
-  	case "o-stg" "o-prod"
+  	case "o-stg"
+			set color_k8s yellow
+			set color_k8s_icon bryellow
+  	case o-prod  o-prod-new
 			set color_k8s red
 			set color_k8s_icon brred
+  	case "o-cicd-infra"
+			set color_k8s green
+			set color_k8s_icon brgreen
   end
 
   set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.namespace}")

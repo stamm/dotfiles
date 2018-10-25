@@ -7,6 +7,7 @@ set -x LC_ALL en_US.UTF-8
 set -x GOPATH $HOME/go
 set -x GOROOT /usr/local/go_versions/current
 set -x GO15VENDOREXPERIMENT 1
+set -x HOMEBREW_GITHUB_API_TOKEN 74a5f03048eec84830f0eb051a01c39ce276edda
 
 # set CDPATH . $GOPATH/src
 # eval (command echo $PATH)
@@ -15,7 +16,7 @@ set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
 #set PATH $HOME/.cargo/bin $PATH
-set PAGER "most"
+set -x PAGER "most"
 
 set -x EDITOR nvim
 
@@ -32,22 +33,21 @@ abbr --add kx "kubectx"
 abbr --add kn "kubens"
 abbr --add kg "kubectl get"
 abbr --add kcd 'kubectl config set-context (kubectl config current-context) --namespace '
-abbr --add kstg "kubectl --context=o-stg"
+abbr --add kstg "kubectl --context=o-dev"
 abbr --add kgp "kubectl get po"
-abbr --add kgpa "kubectl get po --all-namespaces"
+abbr --add kgpa "kubectl get po --all-namespaces -owide"
 abbr --add kgs "kubectl get svc"
-abbr --add kgsa "kubectl get svc --all-namespaces"
+abbr --add kgsa "kubectl get svc --all-namespaces -owide"
 abbr --add kgi "kubectl get ing"
-abbr --add kgia "kubectl get ing --all-namespaces"
+abbr --add kgia "kubectl get ing --all-namespaces -owide"
 
 function kgcm -w 'kubectl get cm' -d 'kubectl get cm'
 	kubectl get cm $argv
 end
 alias kgcma "kubectl get cm --all-namespaces"
 
-#abbr --add setgo110 "ln -nfs /usr/local/go_versions/1.10.3 /usr/local/go_versions/current"
-#abbr --add setgotip "ln -nfs /usr/local/go_versions/tip /usr/local/go_versions/current"
 
+abbr --add g "git"
 
 
 
