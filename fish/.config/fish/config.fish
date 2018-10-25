@@ -8,13 +8,13 @@ set -x GOPATH $HOME/go
 set -x GOROOT /usr/local/go_versions/current
 set -x GO15VENDOREXPERIMENT 1
 
-set CDPATH . $GOPATH/src
+# set CDPATH . $GOPATH/src
 # eval (command echo $PATH)
 set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 # /opt/X11/bin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
-set PATH $HOME/.cargo/bin $PATH
+#set PATH $HOME/.cargo/bin $PATH
 set PAGER "most"
 
 set -x EDITOR nvim
@@ -29,6 +29,8 @@ set GPG_TTY (tty)
 abbr --add vim "nvim"
 abbr --add k "kubectl"
 abbr --add kx "kubectx"
+abbr --add kn "kubens"
+abbr --add kg "kubectl get"
 abbr --add kcd 'kubectl config set-context (kubectl config current-context) --namespace '
 abbr --add kstg "kubectl --context=o-stg"
 abbr --add kgp "kubectl get po"
@@ -53,12 +55,11 @@ alias kgcma "kubectl get cm --all-namespaces"
 
 
 eval (command direnv hook fish)
-if [ -z "$TMUX" ]
-	set -x TERM xterm-256color
-end
 
-if [ "$TERM" != "screen-255color" ]
-	eval (command tmuxinator start local)
+tmux has-session -t base;
+if [ $status != 0 ]
+	tmux new -s base
 end
+tmux attach -t base;
 
 

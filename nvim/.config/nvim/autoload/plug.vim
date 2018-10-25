@@ -96,7 +96,7 @@ let s:plug_src = 'https://github.com/junegunn/vim-plug.git'
 let s:plug_tab = get(s:, 'plug_tab', -1)
 let s:plug_buf = get(s:, 'plug_buf', -1)
 let s:mac_gui = has('gui_macvim') && has('gui_running')
-let s:is_win = has('win32') || has('win64')
+let s:is_win = has('win32')
 let s:nvim = has('nvim-0.2') || (has('nvim') && exists('*jobwait') && !s:is_win)
 let s:vim8 = has('patch-8.0.0039') && exists('*job_start')
 let s:me = resolve(expand('<sfile>:p'))
@@ -799,7 +799,11 @@ function! s:bang(cmd, ...)
     let cmd = a:0 ? s:with_cd(a:cmd, a:1) : a:cmd
     if s:is_win
       let batchfile = tempname().'.bat'
+<<<<<<< HEAD
       call writefile(['@echo off', cmd], batchfile)
+=======
+      call writefile(["@echo off\r", cmd . "\r"], batchfile)
+>>>>>>> 040c137132527a671accf35836236b79ed70d9cf
       let cmd = batchfile
     endif
     let g:_plug_bang = (s:is_win && has('gui_running') ? 'silent ' : '').'!'.escape(cmd, '#!%')
@@ -908,7 +912,7 @@ function! s:finish(pull)
     call add(msgs, "Press 'R' to retry.")
   endif
   if a:pull && len(s:update.new) < len(filter(getline(5, '$'),
-                \ "v:val =~ '^- ' && stridx(v:val, 'Already up-to-date') < 0"))
+                \ "v:val =~ '^- ' && v:val !~# 'Already up.to.date'"))
     call add(msgs, "Press 'D' to see the updated changes.")
   endif
   echo join(msgs, ' ')
@@ -1196,7 +1200,11 @@ function! s:spawn(name, cmd, opts)
   let s:jobs[a:name] = job
   let cmd = has_key(a:opts, 'dir') ? s:with_cd(a:cmd, a:opts.dir) : a:cmd
   if !empty(job.batchfile)
+<<<<<<< HEAD
     call writefile(['@echo off', cmd], job.batchfile)
+=======
+    call writefile(["@echo off\r", cmd . "\r"], job.batchfile)
+>>>>>>> 040c137132527a671accf35836236b79ed70d9cf
     let cmd = job.batchfile
   endif
   let argv = add(s:is_win ? ['cmd', '/c'] : ['sh', '-c'], cmd)
@@ -2023,7 +2031,11 @@ function! s:system(cmd, ...)
     let cmd = a:0 > 0 ? s:with_cd(a:cmd, a:1) : a:cmd
     if s:is_win
       let batchfile = tempname().'.bat'
+<<<<<<< HEAD
       call writefile(['@echo off', cmd], batchfile)
+=======
+      call writefile(["@echo off\r", cmd . "\r"], batchfile)
+>>>>>>> 040c137132527a671accf35836236b79ed70d9cf
       let cmd = batchfile
     endif
     return system(s:is_win ? '('.cmd.')' : cmd)
@@ -2357,7 +2369,11 @@ function! s:preview_commit()
     let cmd = 'cd '.s:shellesc(g:plugs[name].dir).' && git show --no-color --pretty=medium '.sha
     if s:is_win
       let batchfile = tempname().'.bat'
+<<<<<<< HEAD
       call writefile(['@echo off', cmd], batchfile)
+=======
+      call writefile(["@echo off\r", cmd . "\r"], batchfile)
+>>>>>>> 040c137132527a671accf35836236b79ed70d9cf
       let cmd = batchfile
     endif
     execute 'silent %!' cmd
@@ -2426,8 +2442,13 @@ function! s:diff()
         \ . (cnts[1] ? printf(' %d plugin(s) have pending updates.', cnts[1]) : ''))
 
   if cnts[0] || cnts[1]
-    nnoremap <silent> <buffer> <cr> :silent! call <SID>preview_commit()<cr>
-    nnoremap <silent> <buffer> o    :silent! call <SID>preview_commit()<cr>
+    nnoremap <silent> <buffer> <plug>(plug-preview) :silent! call <SID>preview_commit()<cr>
+    if empty(maparg("\<cr>", 'n'))
+      nmap <buffer> <cr> <plug>(plug-preview)
+    endif
+    if empty(maparg('o', 'n'))
+      nmap <buffer> o <plug>(plug-preview)
+    endif
   endif
   if cnts[0]
     nnoremap <silent> <buffer> X :call <SID>revert()<cr>

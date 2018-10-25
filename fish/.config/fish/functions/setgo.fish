@@ -3,7 +3,7 @@ function setgo
 	case 1.10
 		set version 1.10.3
 	case 1.11
-		set version 1.11beta1
+		set version 1.11.1
 	case tip
 		set version tip
 	case '*'
