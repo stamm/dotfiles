@@ -514,10 +514,10 @@ nmap <Leader>ma <Plug>BookmarkShowAll
 " Ruby {{{
 augroup filetype_ruby
 	au!
-	autocmd BufNewFile,BufRead *.rb,Gemfile setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *.rb,*.pp,Gemfile,Guardfile setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *.pp,Gemfile,Guardfile setfiletype ruby
 augroup END
 " }}}
-
 
 
 " Java {{{

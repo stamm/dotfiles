@@ -41,6 +41,8 @@ abbr --add kgsa "kubectl get svc --all-namespaces -owide"
 abbr --add kgi "kubectl get ing"
 abbr --add kgia "kubectl get ing --all-namespaces -owide"
 
+abbr --add be "bundle exec"
+
 function kgcm -w 'kubectl get cm' -d 'kubectl get cm'
 	kubectl get cm $argv
 end
