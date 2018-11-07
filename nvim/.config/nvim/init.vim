@@ -13,7 +13,7 @@ call plug#begin('~/.config/nvim/plugged/')
 	else
 		Plug 'Valloric/YouCompleteMe'
 	endif
-	Plug 'fatih/vim-go', { 'branch': 'gocode-change', 'do': ':GoUpdateBinaries' }
+	Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 	", { 'tag': '*' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
