@@ -58,10 +58,10 @@ abbr --add g "git"
 
 eval (command direnv hook fish)
 
-tmux has-session -t base;
-if [ $status != 0 ]
-	tmux new -s base
+if [ $TERM != "screen-256color" ]
+	tmux has-session -t base;
+	if [ $status != 0 ]
+		tmux new -s base
+	end
+	tmux attach -t base;
 end
-tmux attach -t base;
-
-
