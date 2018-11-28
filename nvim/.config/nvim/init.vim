@@ -465,7 +465,7 @@ nmap <Leader>ma <Plug>BookmarkShowAll
 augroup filetype_ruby
 	au!
 	autocmd BufNewFile,BufRead *.rb,*.pp,Gemfile,Guardfile,Rakefile,rspec setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
-	autocmd BufNewFile,BufRead *rb,*.pp,Gemfile,Guardfile,Rakefile,rspec setfiletype ruby
+	autocmd BufNewFile,BufRead *.rb,*.pp,Gemfile,Guardfile,Rakefile,rspec setfiletype ruby
 augroup END
 " }}}
 
