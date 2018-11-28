@@ -1,7 +1,7 @@
 call plug#begin('~/.config/nvim/plugged/')
 "	Plug 'majutsushi/tagbar'
 	Plug 'ervandew/supertab'
-	Plug 'garyburd/go-explorer'
+	" Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
 		Plug 'autozimu/LanguageClient-neovim', {
@@ -25,7 +25,7 @@ call plug#begin('~/.config/nvim/plugged/')
 	Plug 'scrooloose/nerdtree'
 	" Plug 'vim-ctrlspace/vim-ctrlspace'
 	Plug 'tpope/vim-fugitive'
-	Plug 'neomake/neomake'
+	Plug 'w0rp/ale'
 	Plug 'bling/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
 	Plug 'tpope/vim-commentary'
@@ -41,7 +41,7 @@ call plug#begin('~/.config/nvim/plugged/')
 	" Plug 'christoomey/vim-tmux-navigator'
 	"
 
-	Plug 'tpope/vim-rails'
+	Plug 'vim-ruby/vim-ruby'
 	Plug 'tpope/vim-bundler'
 	Plug 'artur-shaik/vim-javacomplete2'
 call plug#end()
@@ -334,7 +334,7 @@ let g:go_def_mode = 'godef'
 augroup filetype_go
 	au!
 	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
-	autocmd BufWritePost,BufNewFile,BufReadPost *.go Neomake
+	autocmd BufNewFile,BufRead *.go setfiletype go
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
 	autocmd FileType go nmap <leader>gt  <Plug>(go-test)
@@ -351,6 +351,8 @@ augroup filetype_go
 	autocmd BufEnter glide.lock command! -bang A edit glide.yaml
 	autocmd BufEnter Gopkg.toml command! -bang A edit Gopkg.lock
 	autocmd BufEnter Gopkg.lock command! -bang A edit Gopkg.toml
+
+	autocmd BufNewFile,BufRead _helpers.tpl setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
 augroup END
 " }}}
 
@@ -395,58 +397,10 @@ function! s:build_go_files()
 	endif
 endfunction
 
-let g:neomake_open_list = 0
-" let g:neomake_highlight_lines = 1
-
-let g:neomake_go_gohint_maker = {
-	\ 'exe': 'gohint',
-	\ 'args': ['-config=' . $HOME. '/.dotfiles/go/go_hint_config.json'],
-	\ 'errorformat':
-	\ '%W%f:%l:%c: %m,' .
-	\ '%-G%.%#'
-	\ }
-
-let g:neomake_go_errcheckmy_maker = {
-	\ 'exe': 'errcheck',
-	\ 'mapexpr': "getcwd() . '/' . v:val",
-	\ 'errorformat': '%E%f:%l:%c:\ %m,' .
-	\ '%W%f:%l:%c:\ %#%m'
-	\ }
-
-let g:neomake_go_gosimple_maker = {
-	\ 'exe': '/Users/stamm/code/go/src/honnef.co/go/tools/cmd/gosimple/gosimple',
-	\ 'cwd': '%:h',
-	\ 'mapexpr': 'neomake_bufdir . "/" . v:val',
-	\ 'errorformat': '%W%f:%l:%c:\ %#%m'
-	\ }
-
-	" \ 'args': ['--disable-all', '--enable=errcheck', '--enable=gosimple', '--enable=staticcheck', '--enable=unused'],
-let g:neomake_go_gometalinter_maker = {
-	\ 'args': ['--disable-all', '--enable=errcheck', '--enable=gosimple'],
-	\ 'append_file': 0,
-	\ 'cwd': '%:h',
-	\ 'mapexpr': 'neomake_bufdir . "/" . v:val',
-	\ 'errorformat': '%W%f:%l:%c:%m',
-	\ }
-
-" let g:neomake_go_checkers = ['go', 'errcheck']
-" let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet', 'errcheckmy', 'gosimple']
-" let g:neomake_go_enabled_makers = ['gometalinter']
-let g:neomake_go_enabled_makers = ['go', 'gohint', 'govet']
-" let g:neomake_go_enabled_makers = ['go', 'gohint', 'errcheck']
-" let g:neomake_go_enabled_makers = ['go']
-" let g:neomake_go_enabled_makers = []
-
-let g:neomake_make_maker = {
-	\ 'exe': 'make',
-	\ 'args': ['build'],
-	\ 'errorformat': '%f:%l:%c: %m',
-	\ }
-let g:neomake_build_maker = { 'exe': 'make', 'args': ['lint'], 'errorformat': '[%tRROR]\ %f:[%l]\ %m,%-G%.%#' }
-
-hi link NeomakeError SpellBad
-hi link NeomakeWarning SpellCap
-hi NeomakeErrorSign ctermfg=red
+" Ale {{{
+" let g:ale_set_highlights = 0
+let g:airline#extensions#ale#enabled = 1
+" }}}
 
 " UltiSnips {{{
 let g:UltiSnipsExpandTrigger = "<c-e>"
@@ -498,24 +452,20 @@ let g:UltiSnipsUsePythonVersion = 3
 " endif
 " }}}
 
-" bookmarks
+" bookmarks {{{
 " let g:bookmark_save_per_working_dir = 1
 let g:bookmark_auto_close = 0
 let g:bookmark_no_default_key_mappings = 1
 nmap <Leader>mm <Plug>BookmarkToggle
 nmap <Leader>ma <Plug>BookmarkShowAll
-" let g:LanguageClient_serverCommands = {
-"     \ 'go': ['go-langserver'],
-"     \ }
+" }}}
 
-" " Automatically start language servers.
-" let g:LanguageClient_autoStart = 1
-"
+
 " Ruby {{{
 augroup filetype_ruby
 	au!
-	autocmd BufNewFile,BufRead *.rb,*.pp,Gemfile,Guardfile setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
-	autocmd BufNewFile,BufRead *.pp,Gemfile,Guardfile setfiletype ruby
+	autocmd BufNewFile,BufRead *.rb,*.pp,Gemfile,Guardfile,Rakefile,rspec setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *rb,*.pp,Gemfile,Guardfile,Rakefile,rspec setfiletype ruby
 augroup END
 " }}}
 
@@ -526,3 +476,7 @@ augroup filetype_java
 	autocmd FileType java setlocal omnifunc=javacomplete#Complete
 augroup END
 " }}}
+"
+" Show trailing whitespace and spaces before a tab:
+highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\\t/
