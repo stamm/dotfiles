@@ -24,6 +24,7 @@ set -x EDITOR nvim
 
 set PATH ~/.rbenv/shims $PATH
 # status --is-interactive; and source (rbenv init -|psub)
+set PATH /usr/local/opt/grep/libexec/gnubin $PATH
 
 set GPG_TTY (tty)
 
@@ -34,12 +35,13 @@ abbr --add kn "kubens"
 abbr --add kg "kubectl get"
 abbr --add kcd 'kubectl config set-context (kubectl config current-context) --namespace '
 abbr --add kstg "kubectl --context=o-dev"
-abbr --add kgp "kubectl get po"
+abbr --add kgp "kubectl get po -owide"
 abbr --add kgpa "kubectl get po --all-namespaces -owide"
 abbr --add kgs "kubectl get svc"
 abbr --add kgsa "kubectl get svc --all-namespaces -owide"
 abbr --add kgi "kubectl get ing"
 abbr --add kgia "kubectl get ing --all-namespaces -owide"
+abbr --add kdp "kubectl describe po"
 
 abbr --add be "bundle exec"
 

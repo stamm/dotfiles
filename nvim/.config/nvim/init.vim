@@ -224,19 +224,19 @@ xnoremap <leader>p "_dP
 
 iabbrev @@ stammru@gmail.com
 
-if executable('ag')
-" Use ag over grep
-	set grepprg=ag\ --vimgrep
+" if executable('ag')
+" " Use ag over grep
+" 	set grepprg=rg\ --vimgrep
 
-	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-	let g:ctrlp_user_command = 'ag %s --skip-vcs-ignores -l --nocolor -g ""'
-endif
-
-" if executable('rg')
-" 	set grepprg=rg\ --color=never
-
-" 	let g:ctrlp_user_command = 'rg %s --no-ignore-vcs --files --color=never -g ""'
+" 	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+" 	let g:ctrlp_user_command = 'ag %s --skip-vcs-ignores -l --nocolor -g ""'
 " endif
+
+if executable('rg')
+	set grepprg=rg\ --color=never
+
+	let g:ctrlp_user_command = 'rg %s --no-ignore-vcs --files --color=never -g ""'
+endif
 
 if has('nvim')
 	nnoremap <silent> <C-Space> :CtrlPBuffer<cr>
@@ -267,7 +267,7 @@ let g:ctrlp_max_files=0     " do not limit the number of searchable files
 
 
 let g:grepper = {
-	\ 'tools': ['ag', 'rg'],
+	\ 'tools': ['rg', 'ag'],
 	\ 'rg': {
 	\ 'grepprg': 'rg --no-ignore-vcs --no-heading --color=never --line-number --column --sort-files',
 	\ },
@@ -280,14 +280,14 @@ nnoremap <silent> <leader>f :set operatorfunc=<SID>AckOperator<Enter>g@
 vnoremap <silent> <leader>f :<c-u>call <SID>AckOperator(visualmode())<Enter>
 
 nnoremap <leader>f* :Grepper -cword -noprompt<Enter>
-nnoremap <leader>fnv* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
-nnoremap <leader>fnvt* :Grepper -cword -noprompt -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
+nnoremap <leader>fnv* :Grepper -cword -noprompt -grepprg rg -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
+nnoremap <leader>fnvt* :Grepper -cword -noprompt -grepprg rg -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
 
 nnoremap <silent> <leader>ff :Grepper<Enter>
-nnoremap <silent> <leader>ft :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor -G '*_test.go'<Enter>
-nnoremap <silent> <leader>fnt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore '*_test.go'<Enter>
-nnoremap <silent> <leader>fnv :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
-nnoremap <silent> <leader>fnvt :Grepper -grepprg ag -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
+nnoremap <silent> <leader>ft :Grepper -grepprg rg -U --vimgrep --nogroup --nocolor -G '*_test.go'<Enter>
+nnoremap <silent> <leader>fnt :Grepper -grepprg rg -U --vimgrep --nogroup --nocolor --ignore '*_test.go'<Enter>
+nnoremap <silent> <leader>fnv :Grepper -grepprg rg -U --vimgrep --nogroup --nocolor --ignore './vendor/'<Enter>
+nnoremap <silent> <leader>fnvt :Grepper -grepprg rg -U --vimgrep --nogroup --nocolor --ignore './vendor/' --ignore '*_test.go'<Enter>
 
 function! s:AckOperator(type)
 	let saved_unnamed_register = @@
