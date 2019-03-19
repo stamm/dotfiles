@@ -54,7 +54,7 @@ alias kgcma "kubectl get cm --all-namespaces"
 abbr --add g "git"
 
 
-source local/local.fish
+source ~/.config/fish/local/local.fish
 
 
 
