@@ -7,7 +7,6 @@ set -x LC_ALL en_US.UTF-8
 set -x GOPATH $HOME/go
 set -x GOROOT /usr/local/go_versions/current
 set -x GO15VENDOREXPERIMENT 1
-set -x HOMEBREW_GITHUB_API_TOKEN 74a5f03048eec84830f0eb051a01c39ce276edda
 
 # set CDPATH . $GOPATH/src
 # eval (command echo $PATH)
@@ -28,6 +27,7 @@ set PATH /usr/local/opt/grep/libexec/gnubin $PATH
 
 set GPG_TTY (tty)
 
+set PATH $HOME/.krew/bin $PATH
 abbr --add vim "nvim"
 abbr --add k "kubectl"
 abbr --add kx "kubectx"
@@ -54,6 +54,7 @@ alias kgcma "kubectl get cm --all-namespaces"
 abbr --add g "git"
 
 
+source local/local.fish
 
 
 
