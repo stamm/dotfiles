@@ -33,3 +33,5 @@
 	insteadOf = https://github.com/
 [url "git@gitlab.ozon.ru:"]
 	insteadOf = https://gitlab.ozon.ru/
+[pull]
+	rebase = true
