@@ -810,7 +810,7 @@ function! s:bang(cmd, ...)
     let cmd = a:0 ? s:with_cd(a:cmd, a:1) : a:cmd
     if s:is_win
       let batchfile = tempname().'.bat'
-      call writefile(['@echo off', cmd], batchfile)
+      call writefile(["@echo off\r", cmd . "\r"], batchfile)
       let cmd = batchfile
     endif
     let g:_plug_bang = (s:is_win && has('gui_running') ? 'silent ' : '').'!'.escape(cmd, '#!%')
