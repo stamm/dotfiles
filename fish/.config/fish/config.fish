@@ -50,6 +50,8 @@ function kgcm -w 'kubectl get cm' -d 'kubectl get cm'
 end
 alias kgcma "kubectl get cm --all-namespaces"
 
+alias krew "kubectl-krew"
+
 
 abbr --add g "git"
 
