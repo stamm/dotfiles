@@ -1,6 +1,6 @@
 call plug#begin('~/.config/nvim/plugged/')
 "	Plug 'majutsushi/tagbar'
-	Plug 'ervandew/supertab'
+	" Plug 'ervandew/supertab'
 	" Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
@@ -13,7 +13,7 @@ call plug#begin('~/.config/nvim/plugged/')
 	else
 		Plug 'Valloric/YouCompleteMe'
 	endif
-	Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+	Plug 'fatih/vim-go', { 'tag': '*', 'do': ':GoUpdateBinaries' }
 	", { 'tag': '*' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
@@ -322,14 +322,17 @@ let g:go_highlight_types = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_operators = 1
 let g:go_metalinter_autosave = 0
+let g:go_metalinter_command='golangci-lint'
 " let g:go_auto_type_info = 1
 " let g:go_auto_sameids = 1
 " let g:go_list_type = "quickfix"
 let g:go_list_type = "locationlist"
 let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
-let g:go_info_mode = 'gocode'
-let g:go_def_mode = 'godef'
+let g:go_info_mode = 'gopls'
+" let g:go_def_mode = 'godef'
+let g:go_def_mode='gopls'
+
 " Go file settings ---------------------- {{{
 augroup filetype_go
 	au!
@@ -382,7 +385,9 @@ if has('nvim')
 	" Use partial fuzzy matches like YouCompleteMe
 	call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
 	call deoplete#custom#source('_', 'converters', ['converter_remove_paren'])
-	call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
+	" call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
+	" <TAB>: completion.
+	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 else
 	let g:ycm_min_num_of_chars_for_completion = 1
 endif
@@ -400,6 +405,7 @@ endfunction
 " Ale {{{
 " let g:ale_set_highlights = 0
 let g:airline#extensions#ale#enabled = 1
+let g:ale_go_langserver_executable = 'gopls'
 " }}}
 
 " UltiSnips {{{
