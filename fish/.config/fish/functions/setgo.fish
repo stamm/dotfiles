@@ -5,7 +5,7 @@ function setgo
 	case 1.11
 		set go_version 1.11.5
 	case 1.12
-		set go_version 1.12.1
+		set go_version 1.12.5
 	case tip
 		set go_version tip
 	case '*'
