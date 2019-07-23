@@ -2,11 +2,13 @@
 	name = Rustam Zagirov
 	email = stammru@gmail.com
 	signingkey = 809B393BBA188BCA
-[includeIf "gitdir:~/code/ozon/*"]
+[includeIf "gitdir:~/code/ozon/**/"]
 	path = config-work
-[includeIf "gitdir:~/code/go/src/godep.ozon.ru/*"]
+[includeIf "gitdir:/tmp/**/"]
 	path = config-work
-[includeIf "gitdir:~/code/go/src/gitlab.ozon.ru/*"]
+[includeIf "gitdir:~/code/go/src/godep.ozon.ru/**/"]
+	path = config-work
+[includeIf "gitdir:~/code/go/src/gitlab.ozon.ru/**/"]
 	path = config-work
 [core]
 	excludesfile = /Users/stamm/.config/git/ignore
