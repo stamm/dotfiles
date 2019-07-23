@@ -13,7 +13,7 @@ SETUVAR _fish_abbr_kdp:kubectl\x20describe\x20po
 SETUVAR _fish_abbr_kg:kubectl\x20get
 SETUVAR _fish_abbr_kgi:kubectl\x20get\x20ing
 SETUVAR _fish_abbr_kgia:kubectl\x20get\x20ing\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide
-SETUVAR _fish_abbr_kgp:kubectl\x20get\x20po\x20\x2dowide
+SETUVAR _fish_abbr_kgp:kubectl\x20get\x20po
 SETUVAR _fish_abbr_kgpa:kubectl\x20get\x20po\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide
 SETUVAR _fish_abbr_kgs:kubectl\x20get\x20svc
 SETUVAR _fish_abbr_kgsa:kubectl\x20get\x20svc\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide
