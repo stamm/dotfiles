@@ -75,6 +75,7 @@ set undodir=~/.config/nvim/.undo
 let g:rehash256 = 1
 " let g:molokai_original = 1
 colorscheme molokai
+highlight LineNr ctermfg=grey
 " }}}
 
 let mapleader = ","
