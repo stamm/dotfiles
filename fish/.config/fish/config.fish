@@ -15,7 +15,7 @@ set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
 #set PATH $HOME/.cargo/bin $PATH
-set -x PAGER "most"
+#set -x PAGER "most"
 
 set -x EDITOR nvim
 
@@ -36,24 +36,28 @@ abbr --add kg "kubectl get"
 abbr --add kcd 'kubectl config set-context (kubectl config current-context) --namespace '
 abbr --add kstg "kubectl --context=o-dev"
 abbr --add kgp "kubectl get po -owide"
-abbr --add kgpa "kubectl get po --all-namespaces -owide"
+abbr --add kgpa "kubectl get po -A -owide"
 abbr --add kgs "kubectl get svc"
-abbr --add kgsa "kubectl get svc --all-namespaces -owide"
+abbr --add kgsa "kubectl get svc -A -owide"
 abbr --add kgi "kubectl get ing"
-abbr --add kgia "kubectl get ing --all-namespaces -owide"
+abbr --add kgia "kubectl get ing -A -owide"
 abbr --add kdp "kubectl describe po"
+abbr --add kdn "kubectl describe no"
+abbr --add kd "kubectl describe"
 
 abbr --add be "bundle exec"
 
 function kgcm -w 'kubectl get cm' -d 'kubectl get cm'
 	kubectl get cm $argv
 end
-alias kgcma "kubectl get cm --all-namespaces"
+alias kgcma "kubectl get cm -A"
 
 alias krew "kubectl-krew"
 
 
 abbr --add g "git"
+abbr --add ll "exa -l"
+
 
 
 source ~/.config/fish/local/local.fish
