@@ -70,13 +70,13 @@
 # default, test < cmd - return : open -na /Applications/Terminal.app
 
 # open terminal, blazingly fast compared to iTerm/Hyper
-cmd - return : open -na /Applications/Kitty.app
+# cmd - return : open -na /Applications/Kitty.app
 
 # open qutebrowser
-cmd + shift - return : ~/Scripts/qtb.sh
+# cmd + shift - return : ~/Scripts/qtb.sh
 
 # close focused window
-alt - w : chunkc tiling::window --close
+# alt - w : chunkc tiling::window --close
 
 # focus window
 alt - h : chunkc tiling::window --focus west
@@ -225,3 +225,4 @@ ctrl + alt - d : chunkc tiling::desktop --layout float
 
 ctrl + alt - w : chunkc tiling::desktop --deserialize ~/.chunkwm_layouts/dev_1
 
+# chunkc tiling::rule --name "Cisco AnyConnect Secure Mobility Client" --state float
