@@ -1,11 +1,11 @@
 function setgo
 	switch (echo $argv[1])
 	case 1.10
-		set go_version 1.10.3
+		set go_version 1.10.8
 	case 1.11
-		set go_version 1.11.5
+		set go_version 1.11.10
 	case 1.12
-		set go_version 1.12.5
+		set go_version 1.12.7
 	case tip
 		set go_version tip
 	case '*'
