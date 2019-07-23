@@ -136,6 +136,4 @@ chunkc core::load ffm.so
 # NOTE: sample rules for the tiling plugin
 #
 
-chunkc tiling::rule --owner Finder --name Copy --state float &
-chunkc tiling::rule --owner \"App Store\" --state float &
 chunkc tiling::rule --owner \"Cisco AnyConnect Secure Mobility Client\" --state float &
