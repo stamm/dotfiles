@@ -64,6 +64,10 @@ else
 	set history=1000         " remember more commands and search history
 	set hlsearch      " highlight search terms
 	set incsearch     " show search matches as you type
+
+	set nostartofline              " Emulate typical editor navigation behaviour
+	set nopaste                    " Start in normal (non-paste) mode
+
 	set laststatus=2
 	set listchars=tab:▸\ ,trail:·,extends:#,nbsp:·,eol:¬
 	set smarttab      " insert tabs on the start of a line according to shiftwidth, not tabstop
@@ -94,6 +98,8 @@ set cursorline
 set nocursorcolumn           " speed up syntax highlighting
 set lazyredraw          " Wait to redraw
 set autowrite       " Automatically save before :next, :make etc.
+" Quickly time out on keycodes, but never time out on mappings
+set notimeout ttimeout ttimeoutlen=200
 " set wrap
 se wrap linebreak
 se colorcolumn=120
@@ -102,9 +108,11 @@ set exrc " enable autoload .vimrc in current project
 set secure " Disable autocmd when autoload
 
 set hidden
-set tabstop=2
+set tabstop=8
 set copyindent    " copy the previous indentation on autoindenting
-set shiftwidth=2  " number of spaces to use for autoindenting
+set shiftwidth=2               " Number of spaces for
+set softtabstop=2              " ...each indent level
+
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set scrolloff=4   " keep 4 lines off the edges of the screen when scrolling
 set virtualedit=all             " allow the cursor to go in to "invalid" places
@@ -114,6 +122,7 @@ vnoremap / /\v
 nnoremap <silent> <leader>/ :nohlsearch<CR>
 set ignorecase    " ignore case when searching
 set smartcase     " ignore case if search pattern is all lowercase, case-sensitive otherwise
+set incsearch                  " Incremental search
 set gdefault      " replace in all file
 set showmatch     " set show matching parenthesis
 set clipboard=unnamed
@@ -366,6 +375,16 @@ augroup filetype_vim
 	autocmd FileType vim setlocal foldmethod=marker
 augroup END
 " }}}
+
+augroup filetype
+	" Remove ALL autocommands for the current group.
+	autocmd!
+
+	" Jump to last-known-position when editing files
+	" Note: The | character is used in Vim as a command separator (like ; in C)
+	autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+augroup END
+
 
 
 set completeopt-=preview
