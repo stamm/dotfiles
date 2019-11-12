@@ -7,3 +7,5 @@ stow git
 stow nvim
 stow skhd
 stow tmux
+stow cheat
+stow hammerspoon
