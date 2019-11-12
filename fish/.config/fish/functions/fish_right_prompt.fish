@@ -8,7 +8,7 @@ function kubectl_status
     return
   end
 
-  set -l ctx (kubectl config current-context 2>/dev/null)
+  set -l ctx (grep -oP '(?<=current-context: ).+' $config 2>/dev/null)
   if [ $status -ne 0 ]
     echo (set_color red)$KUBECTL_PROMPT_ICON" "(set_color white)"no context"
     return
@@ -17,18 +17,25 @@ function kubectl_status
   set -l color_k8s white
   set -l color_k8s_icon cyan
   switch $ctx
-  	case "o-stg"
-			set color_k8s yellow
-			set color_k8s_icon bryellow
-  	case o-prod  o-prod-new
+  	case o-prod
 			set color_k8s red
 			set color_k8s_icon brred
-  	case "o-cicd-infra"
+  	case o-infra-ts
+			set color_k8s magenta
+			set color_k8s_icon brmagenta
+  	case o-stg
+			set color_k8s yellow
+			set color_k8s_icon bryellow
+  	case o-dev
+			set color_k8s blue
+			set color_k8s_icon brblue
+  	case o-cicd-infra
 			set color_k8s green
 			set color_k8s_icon brgreen
   end
 
-  set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.namespace}")
+  # set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.namespace}")
+  set -l ns (grep -A1 "cluster: $ctx" $config | grep -oP '(?<=namespace: ).+')
   [ -z $ns ]; and set -l ns 'default'
 
   echo (set_color $color_k8s_icon)$KUBECTL_PROMPT_ICON" "(set_color $color_k8s)"($ctx$KUBECTL_PROMPT_SEPARATOR$ns)"
