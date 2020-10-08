@@ -8,8 +8,8 @@ call plug#begin('~/.config/nvim/plugged/')
     \ 'branch': 'next',
     \ 'do': 'bash install.sh',
     \ }
-		Plug 'Shougo/deoplete.nvim', { 'tag': '*', 'do': ':UpdateRemotePlugins' }
-		Plug 'zchee/deoplete-go', { 'do': 'make'}
+		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+		Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
 	else
 		Plug 'Valloric/YouCompleteMe'
 	endif
@@ -18,6 +18,7 @@ call plug#begin('~/.config/nvim/plugged/')
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
 	Plug 'fatih/molokai'
+	Plug 'arcticicestudio/nord-vim'
 	Plug 'ctrlpvim/ctrlp.vim', { 'tag': '*' }
 	Plug '/usr/local/opt/fzf'
 	Plug 'junegunn/fzf.vim'
@@ -43,14 +44,16 @@ call plug#begin('~/.config/nvim/plugged/')
 
 	Plug 'vim-ruby/vim-ruby'
 	Plug 'tpope/vim-bundler'
-	Plug 'artur-shaik/vim-javacomplete2'
+	" Plug 'artur-shaik/vim-javacomplete2'
+	Plug 'google/vim-jsonnet'
+	Plug 'tsandall/vim-rego'
 call plug#end()
 
 " let g:python2_host_prog = '/usr/local/bin/python'
-let g:python2_host_prog = '/usr/bin/python'
+let g:python2_host_prog = '/usr/local/bin/python'
 let g:python3_host_prog = '/usr/local/bin/python3'
 " Skip the check of neovim module
-let g:python3_host_skip_check = 1
+" let g:python3_host_skip_check = 1
 
 
 
@@ -78,7 +81,7 @@ set undodir=~/.config/nvim/.undo
 " Color schema {{{
 let g:rehash256 = 1
 " let g:molokai_original = 1
-colorscheme molokai
+colorscheme nord
 highlight LineNr ctermfg=grey
 " }}}
 
@@ -116,6 +119,8 @@ set softtabstop=2              " ...each indent level
 set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set scrolloff=4   " keep 4 lines off the edges of the screen when scrolling
 set virtualedit=all             " allow the cursor to go in to "invalid" places
+
+set foldlevelstart=1
 
 nnoremap / /\v
 vnoremap / /\v
@@ -218,6 +223,7 @@ let NERDTreeMapJumpPrevSibling = ''
 let NERDTreeAutoDeleteBuffer = 1
 let NERDTreeIgnore=['\.git$[[dir]]', '\.idea$[[dir]]', '\.DS_Store$']
 let NERDTreeMinimalUI=1
+let NERDTreeCreatePrefix='silent keepalt keepjumps'
 
 nnoremap <leader>' viW<esc>a'<esc>hBi'<esc>lel
 nnoremap <leader>" viW<esc>a"<esc>hBi"<esc>lel
@@ -248,11 +254,12 @@ if executable('rg')
 	let g:ctrlp_user_command = 'rg %s --no-ignore-vcs --files --color=never -g ""'
 endif
 
-if has('nvim')
-	nnoremap <silent> <C-Space> :CtrlPBuffer<cr>
-else
-	nnoremap <silent> <NUL> :CtrlPBuffer<cr>
-endif
+" if has('nvim')
+nnoremap <silent> <c-space> :CtrlPBuffer<cr>
+nnoremap <silent> <leader><space> :CtrlPBuffer<cr>
+" else
+" 	nnoremap <silent> <NUL> :CtrlPBuffer<cr>
+" endif
 nnoremap <space><space> <c-^>
 
 let g:ctrlp_cmd = 'CtrlPMixed'
@@ -325,7 +332,7 @@ nnoremap <silent> <leader>ol :lope<cr> " open locationlist
 au FocusLost * :wa
 
 let g:go_fmt_command = "goimports"
-" let g:go_fmt_options = " -local=godep.lzd.co"
+" let g:go_fmt_options = " -local=gitlab.ozon.ru"
 let g:go_highlight_types = 1
 " let g:go_highlight_fields = 1
 "let g:go_highlight_functions = 1
@@ -337,16 +344,15 @@ let g:go_metalinter_command='golangci-lint'
 " let g:go_auto_sameids = 1
 " let g:go_list_type = "quickfix"
 let g:go_list_type = "locationlist"
-let g:go_gocode_unimported_packages = 1
 let g:go_echo_command_info = 0
 let g:go_info_mode = 'gopls'
-" let g:go_def_mode = 'godef'
 let g:go_def_mode='gopls'
 
+filetype on
 " Go file settings ---------------------- {{{
 augroup filetype_go
 	au!
-	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=1
 	autocmd BufNewFile,BufRead *.go setfiletype go
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
@@ -385,6 +391,14 @@ augroup filetype
 	autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 augroup END
 
+augroup makefile
+  autocmd FileType make   set noexpandtab shiftwidth=8 softtabstop=0
+augroup END
+
+augroup jsonnet
+  autocmd FileType jsonnet   set expandtab tabstop=2 shiftwidth=2
+augroup END
+
 
 
 set completeopt-=preview
@@ -393,9 +407,12 @@ set completeopt+=noinsert
 set completeopt+=noselect
 if has('nvim')
 	let g:deoplete#enable_at_startup = 1
-	let g:deoplete#auto_complete_start_length = 2
-	let g:deoplete#ignore_sources = {}
-	let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
+	call deoplete#custom#option({
+	\ 'auto_complete_start_length': 2,
+	\ 'ignore_sources': {'_': ['buffer', 'member', 'tag', 'file', 'neosnippet']},
+	\ 'omni_patterns': { 'go': '[^. *\t]\.\w*' },
+	\ })
+
 	let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 	let g:deoplete#sources#go#align_class = 1
 	let g:deoplete#sources#go#package_dot = 1
@@ -503,6 +520,34 @@ augroup filetype_java
 augroup END
 " }}}
 "
+" Dockerfile {{{
+augroup filetype_dockerfile
+	au!
+	autocmd BufNewFile,BufRead *.df   set syntax=dockerfile
+augroup END
+" }}}
+
+" C {{{
+augroup filetype_c
+	au!
+	autocmd BufNewFile,BufRead *.c setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
+	autocmd BufNewFile,BufRead *.c setfiletype c
+augroup END
+" }}}
+
+" yaml {{{
+augroup filetype_yaml
+	au!
+	autocmd BufNewFile,BufRead *.yaml,*.yml setlocal expandtab tabstop=2 shiftwidth=2 foldmethod=indent foldlevel=99
+augroup END
+" }}}
+
 " Show trailing whitespace and spaces before a tab:
 highlight ExtraWhitespace ctermbg=red guibg=red
 autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\\t/
+
+
+" keymap layoutts
+nnoremap <silent> <leader>kq :set langmap=""<cr>
+nnoremap <silent> <leader>kb :set langmap=dstn;hjkl<cr>
+
