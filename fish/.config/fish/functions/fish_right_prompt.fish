@@ -35,7 +35,7 @@ function kubectl_status
   end
 
   # set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$ctx\")].context.namespace}")
-  set -l ns (grep -A1 "cluster: $ctx" $config | grep -oP '(?<=namespace: ).+')
+  set -l ns (grep -A1 -E "cluster: $ctx\$" $config | grep -oP '(?<=namespace: ).+')
   [ -z $ns ]; and set -l ns 'default'
 
   echo (set_color $color_k8s_icon)$KUBECTL_PROMPT_ICON" "(set_color $color_k8s)"($ctx$KUBECTL_PROMPT_SEPARATOR$ns)"
