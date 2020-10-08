@@ -10,6 +10,10 @@
 	path = config-work
 [includeIf "gitdir:~/code/go/src/gitlab.ozon.ru/**/"]
 	path = config-work
+[includeIf "gitdir:~/code/github/numtaba/**/"]
+	path = config-work
+[includeIf "gitdir:~/code/envoy/**/"]
+	path = config-work
 [core]
 	excludesfile = /Users/stamm/.config/git/ignore
 	autocrlf = input
