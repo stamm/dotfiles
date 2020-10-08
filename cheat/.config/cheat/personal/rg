@@ -1,0 +1,35 @@
+---
+tags: [ text ]
+---
+
+# List matching files only
+-l str
+
+# Count matching in files
+-l str
+
+# Sort
+‐‐sort path|modified|accessed|created str
+
+# Filter (can be multiple)
+-g '*.go'
+-g '!*_test.go'
+
+# Color
+-p str | less -R
+
+# Multiple patterns
+-e str -e str2
+
+# Gzip, etcd
+-z str
+
+# Search in type list
+-t sh
+
+# Exclude in type list
+-T sh
+
+
+# Print type list
+--type-list 

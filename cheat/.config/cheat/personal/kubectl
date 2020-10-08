@@ -1,0 +1,9 @@
+# Get pod on node:
+kubectl get po -A -owide --field-selector="spec.nodeName=nodename"
+
+# Delete pod on node:
+kubectl delete po --wait=false -A --field-selector="spec.nodeName=nodename"
+
+# Show current control-plane leaders
+kubectl get -o json ep kube-scheduler -n kube-system | jq -r '.metadata.annotations["control-plane.alpha.kubernetes.io/leader"]' | jq '.holderIdentity'
+kubectl get -o json ep kube-controller-manager -n kube-system | jq -r '.metadata.annotations["control-plane.alpha.kubernetes.io/leader"]' | jq '.holderIdentity'

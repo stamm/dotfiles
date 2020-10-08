@@ -1,5 +1,0 @@
-Get pod on node:
-kubectl get po -A -owide --field-selector="spec.nodeName=nodename"
-
-Delete pod on node:
-kubectl delete po --wait=false -A --field-selector="spec.nodeName=nodename"
