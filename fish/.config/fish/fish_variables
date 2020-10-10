@@ -25,6 +25,7 @@ SETUVAR _fish_abbr_kg:kubectl\x20get
 SETUVAR _fish_abbr_kgi:kubectl\x20get\x20ing
 SETUVAR _fish_abbr_kgia:kubectl\x20get\x20ing\x20\x2dA\x20\x2do\x20wide
 SETUVAR _fish_abbr_kgn:kubectl\x20get\x20no\x20\x2do\x20wide
+SETUVAR _fish_abbr_kgnl:kubectl\x20get\x20no\x20\x2do\x20wide\x20\x2dl\x20node\x2drole\x2ekubernetes\x2eio/
 SETUVAR _fish_abbr_kgp:kubectl\x20get\x20po\x20\x2do\x20wide
 SETUVAR _fish_abbr_kgpa:kubectl\x20get\x20po\x20\x2dA\x20\x2do\x20wide
 SETUVAR _fish_abbr_kgpal:kubectl\x20get\x20po\x20\x2dA\x20\x2do\x20wide\x20\x2dl\x20app\x2ekubernetes\x2eio/name\x3d
