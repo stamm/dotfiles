@@ -136,6 +136,9 @@ alt + cmd - f : yabai -m window --toggle zoom-fullscreen
 # toggle window native fullscreen
 shift + alt - f : yabai -m window --toggle native-fullscreen
 
+# toggle window border
+shift + alt - b : yabai -m window --toggle border
+
 # toggle window split type
 alt - e : yabai -m window --toggle split
 
