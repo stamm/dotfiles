@@ -1,0 +1,2 @@
+# endpoint status
+env ETCDCTL_API=3 etcdctl --cacert /etc/etcd/pki/ca.crt --cert /etc/etcd/pki/server.crt --key /etc/etcd/pki/server.key --endpoints=https://10.52.3.46:2379,https://10.52.3.47:2379,https://10.52.3.48:2379 -w table endpoint status
