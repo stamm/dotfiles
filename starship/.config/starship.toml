@@ -1,0 +1,19 @@
+# Don't print a new line at the start of the prompt
+add_newline = false
+
+[python]
+disabled = true
+
+[time]
+disabled = false
+
+[cmd_duration]
+show_milliseconds = true
+
+[directory]
+truncate_to_repo = false
+truncation_length = 8
+
+[kubernetes]
+# format = 'on [⛵ $context \($namespace\)](dimmed green) '
+disabled = false
