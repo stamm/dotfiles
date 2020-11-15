@@ -4,6 +4,16 @@ kubectl get po -A -owide --field-selector="spec.nodeName=nodename"
 # Delete pod on node:
 kubectl delete po --wait=false -A --field-selector="spec.nodeName=nodename"
 
+# Show not running
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+# Sort by restarts
+kubectl get pods --sort-by=.status.containerStatuses[0].restartCount
+kubectl get po -A -owide  | awk '$5 > 50' | sort -k5 -nr
+#
+# Sort by age
+kubectl get pods --sort-by=.metadata.creationTimestamp
+
 # Show current control-plane leaders
 kubectl get -o json ep kube-scheduler -n kube-system | jq -r '.metadata.annotations["control-plane.alpha.kubernetes.io/leader"]' | jq '.holderIdentity'
 kubectl get -o json ep kube-controller-manager -n kube-system | jq -r '.metadata.annotations["control-plane.alpha.kubernetes.io/leader"]' | jq '.holderIdentity'
