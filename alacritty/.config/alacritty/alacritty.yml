@@ -102,24 +102,28 @@ scrolling:
 # Font configuration (changes require restart)
 font:
   normal:
-    family: Droid Sans Mono Slashed for Powerline
+    # family: Droid Sans Mono Slashed for Powerline
+    family: FuraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
-    style: Regular
+    style: Retina
 
   # The bold font face
   bold:
-    family: Droid Sans Mono Slashed for Powerline
+    # family: Droid Sans Mono Slashed for Powerline
+    family: FuraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
-    # style: Bold
+    style: Bold
 
   # The italic font face
   italic:
-    family: Droid Sans Mono Slashed for Powerline
+    # family: Droid Sans Mono Slashed for Powerline
+    family: FuraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
     # style: Italic# Normal (roman) font face
+    style: Light
 
 
   #normal:
