@@ -40,6 +40,11 @@ set -x OBJC_DISABLE_INITIALIZE_FORK_SAFETY YES
 
 set PATH $HOME/.bin $PATH
 
+
+# for calicoctl
+set -x DATASTORE_TYPE kubernetes
+set -x KUBECONFIG ~/.kube/config
+
 abbr --add vim "nvim"
 abbr --add c "cheat"
 abbr --add q "qbec"
