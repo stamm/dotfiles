@@ -95,7 +95,7 @@ status --is-interactive; and source (jump shell fish | psub)
 starship init fish | source
 
 
-set -g fish_user_paths "/usr/local/opt/python@3.7/bin" $fish_user_paths
+set -g fish_user_paths "/usr/local/opt/python@3.9/bin" $fish_user_paths
 set DYLD_LIBRARY_PATH /usr/local/opt/openssl/lib $DYLD_LIBRARY_PATH
 
 
