@@ -71,7 +71,7 @@ abbr --add kd "kubectl describe"
 abbr --add ku "kubectl uncordon"
 abbr --add kdra "kubectl drain --ignore-daemonsets"
 abbr --add ke "kubectl exec -it"
-alias kgcma "kubectl get cm -A"
+abbr --add kgcma "kubectl get cm -A"
 
 alias krew "kubectl-krew"
 
@@ -91,6 +91,8 @@ abbr --add ll "exa -l"
 
 source ~/.config/fish/local/local.fish
 source /usr/local/etc/grc.fish
+status --is-interactive; and source (jump shell fish | psub)
+starship init fish | source
 
 
 set -g fish_user_paths "/usr/local/opt/python@3.7/bin" $fish_user_paths

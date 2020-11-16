@@ -41,13 +41,13 @@ function kubectl_status
   echo (set_color $color_k8s_icon)$KUBECTL_PROMPT_ICON" "(set_color $color_k8s)"($ctx$KUBECTL_PROMPT_SEPARATOR$ns)"
 end
 
-function fish_right_prompt
-	echo (kubectl_status)
-	echo " "
+# function fish_right_prompt
+	# echo (kubectl_status)
+	# echo " "
 
-	set_color $fish_color_autosuggestion ^/dev/null; or set_color 555
-	date "+%H:%M:%S "
+	# set_color $fish_color_autosuggestion ^/dev/null; or set_color 555
+	# date "+%H:%M:%S "
 
-	echo "$CMD_DURATION ms"
-	set_color normal
-end
+	# echo "$CMD_DURATION ms"
+	# set_color normal
+# end

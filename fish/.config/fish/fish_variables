@@ -22,6 +22,7 @@ SETUVAR _fish_abbr_kdp:kubectl\x20describe\x20po
 SETUVAR _fish_abbr_kdra:kubectl\x20drain\x20\x2d\x2dignore\x2ddaemonsets
 SETUVAR _fish_abbr_ke:kubectl\x20exec\x20\x2dit
 SETUVAR _fish_abbr_kg:kubectl\x20get
+SETUVAR _fish_abbr_kgcma:kubectl\x20get\x20cm\x20\x2dA
 SETUVAR _fish_abbr_kgi:kubectl\x20get\x20ing
 SETUVAR _fish_abbr_kgia:kubectl\x20get\x20ing\x20\x2dA\x20\x2do\x20wide
 SETUVAR _fish_abbr_kgn:kubectl\x20get\x20no\x20\x2do\x20wide
