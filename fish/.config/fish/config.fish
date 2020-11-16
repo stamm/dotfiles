@@ -20,6 +20,7 @@ set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
 set PATH $PATH $HOME/Downloads/flutter/bin
+set -gx PATH $PATH $HOME/.krew/bin
 #set PATH $HOME/.cargo/bin $PATH
 #set -x PAGER "most"
 
