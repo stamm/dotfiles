@@ -101,7 +101,7 @@ abbr --add ll "exa -la"
 
 
 source ~/.config/fish/local/local.fish
-source /usr/local/etc/grc.fish
+# source /usr/local/etc/grc.fish
 status --is-interactive; and source (jump shell fish | psub)
 starship init fish | source
 
