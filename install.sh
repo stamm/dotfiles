@@ -10,3 +10,4 @@ stow tmux
 stow cheat
 stow hammerspoon
 stow starship
+stow nnn
