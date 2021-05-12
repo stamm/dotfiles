@@ -1,18 +1,31 @@
-# Get pod on node:
+---
+syntax: bash
+---
+
+# Filter
+
+## pods on node:
 kubectl get po -A -owide --field-selector="spec.nodeName=nodename"
 
-# Delete pod on node:
-kubectl delete po --wait=false -A --field-selector="spec.nodeName=nodename"
-
-# Show not running
+## not running
 kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
 
+## not ready pods
+kubectl get pods -o json  | jq -r '.items[] | select(.status.phase != "Running" or ([ .status.conditions[] | select(.type == "Ready" and .status == "False") ] | length ) == 1 ) | .metadata.namespace + "/" + .metadata.name'
+
 # Sort by restarts
-kubectl get pods --sort-by=.status.containerStatuses[0].restartCount
+kubectl get pods --sort-by=".status.containerStatuses[0].restartCount"
 kubectl get po -A -owide  | awk '$5 > 50' | sort -k5 -nr
-#
+
 # Sort by age
 kubectl get pods --sort-by=.metadata.creationTimestamp
+
+---
+
+# Delete
+
+## Delete pod on node:
+kubectl delete po --wait=false -A --field-selector="spec.nodeName=nodename"
 
 # Show current control-plane leaders
 kubectl get -o json ep kube-scheduler -n kube-system | jq -r '.metadata.annotations["control-plane.alpha.kubernetes.io/leader"]' | jq '.holderIdentity'
