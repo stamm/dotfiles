@@ -1,13 +1,26 @@
 ---
 tags: [ editor ]
 ---
-Bookmarks
+# Bookmarks
 mA, ma, 'a, 'A, :marks:
 
-History of commands
+# History of commands
 q:, q/, q?
 
-Visual
+# Visual
 gv — previous
 
 v_o, v_O
+
+# Folding
+zf - F-old creation
+zo - O-pen fold
+zc - C-lose fold
+zr - R-educe fold
+zm - M-ore close fold
+zR - R-educe fold all nested
+zM - M-ore close fold all nested
+
+zn - disable folding
+zN - back folding
+zi - toogle
