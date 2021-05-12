@@ -49,7 +49,7 @@ window:
   # Values for `decorations` (macOS only):
   #     - transparent: Title bar, transparent background and title bar buttons
   #     - buttonless: Title bar, transparent background, but no title bar buttons
-  decorations: full
+  decorations: none
 
   # Startup Mode (changes require restart)
   #
@@ -614,4 +614,7 @@ key_bindings:
   - { key: NumpadEnter,             chars: "\n"                              }
   - { key: F,        mods: Alt,     chars: "\x1bf"                           }
   - { key: B,        mods: Alt,     chars: "\x1bb"                           }
+  - { key: D,        mods: Alt,     chars: "\x1bd"                           }
+  - { key: N,        mods: Alt,     chars: "\x1bn"                           }
+  - { key: O,        mods: Alt,     chars: "\x1bo"                           }
   - { key: W,        mods: Command, action: None                             }
