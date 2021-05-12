@@ -123,6 +123,7 @@ end
 
 eval (command direnv hook fish | source)
 
+# if [ $TERM != "screen-256color" ] && [ $TERM_PROGRAM != "vscode" ]
 if [ $TERM != "screen-256color" ]
   tmux has-session -t base;
   if [ $status != 0 ]
@@ -130,3 +131,4 @@ if [ $TERM != "screen-256color" ]
   end
   tmux attach -t base;
 end
+
