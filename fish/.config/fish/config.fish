@@ -19,7 +19,7 @@ set PATH /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 # /opt/X11/bin
 #set PATH $HOME/.bin $PATH 
 set PATH $GOROOT/bin $PATH $GOPATH/bin
-set PATH $PATH $HOME/Downloads/flutter/bin
+fish_add_path $HOME/Downloads/flutter/bin
 set -gx PATH $PATH $HOME/.krew/bin
 #set PATH $HOME/.cargo/bin $PATH
 #set -x PAGER "most"
