@@ -121,7 +121,7 @@ if not pgrep -f ssh-agent > /dev/null
 end
 
 
-eval (command direnv hook fish)
+eval (command direnv hook fish | source)
 
 if [ $TERM != "screen-256color" ]
   tmux has-session -t base;
