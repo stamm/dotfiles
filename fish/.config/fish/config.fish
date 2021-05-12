@@ -106,8 +106,19 @@ status --is-interactive; and source (jump shell fish | psub)
 starship init fish | source
 
 
-set -g fish_user_paths "/usr/local/opt/python@3.9/bin" $fish_user_paths
+# set -g fish_user_paths "/usr/local/opt/python@3.9/bin" $fish_user_paths
 set DYLD_LIBRARY_PATH /usr/local/opt/openssl/lib $DYLD_LIBRARY_PATH
+set CFLAGS -I/usr/local/opt/openssl@1.1/include
+set CPPFLAGS -I/usr/local/opt/openssl@1.1/include
+set LDFLAGS -L/usr/local/opt/openssl@1.1/lib
+set CONFIGURE_OPTS --with-openssl=/usr/local/opt/openssl@1.1
+
+if not pgrep -f ssh-agent > /dev/null
+  eval (ssh-agent -c)
+  set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
+  set -Ux SSH_AGENT_PID $SSH_AGENT_PID
+  set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
+end
 
 
 eval (command direnv hook fish)
