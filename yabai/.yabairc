@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-yabai -m config external_bar          all:20:0
+yabai -m config external_bar          all:26:0
 # global settings
 yabai -m config mouse_follows_focus          on
 yabai -m config focus_follows_mouse          autofocus
@@ -40,16 +40,17 @@ yabai -m rule --add label=cisco-vpn app="Cisco AnyConnect Secure Mobility Client
 yabai -m rule --add label=cisco-vpn app="Microsoft Remote Desktop" manage=off layer=above border=off
 yabai -m rule --add label=licecap app="licecap" manage=off layer=above
 yabai -m rule --add label=vlc app="VLC" manage=off layer=above border=off
+yabai -m rule --add label=allacritty app="Alacritty" border=off
 
 
-yabai -m signal --add event=space_changed \
-    action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-primary-jsx\"'"
-yabai -m signal --add event=display_changed \
-    action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-primary-jsx\"'"
+# yabai -m signal --add event=space_changed \
+#     action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-primary-jsx\"'"
+# yabai -m signal --add event=display_changed \
+#     action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-primary-jsx\"'"
 
-yabai -m signal --add event=space_changed \
-    action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-secondary-jsx\"'"
-yabai -m signal --add event=display_changed \
-    action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-secondary-jsx\"'"
+# yabai -m signal --add event=space_changed \
+#     action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-secondary-jsx\"'"
+# yabai -m signal --add event=display_changed \
+#     action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"nibar-spaces-secondary-jsx\"'"
 
 echo "yabai configuration loaded.."
