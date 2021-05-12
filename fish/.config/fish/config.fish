@@ -31,7 +31,7 @@ set -x CHEAT_USE_FZF true
 # set -x GOOGLE_APPLICATION_CREDENTIALS /Users/stamm/.config/gcloud/application_default_credentials.json
 
 set PATH ~/.rbenv/shims $PATH
-status --is-interactive; and source (rbenv init -|psub)
+# status --is-interactive; and source (rbenv init -|psub)
 set PATH /usr/local/opt/grep/libexec/gnubin $PATH
 
 set GPG_TTY (tty)
