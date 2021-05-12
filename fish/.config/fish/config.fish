@@ -97,7 +97,7 @@ abbr --add g "git"
 abbr --add gc "git commit"
 abbr --add gp "git pull --rebase"
 
-abbr --add ll "exa -l"
+abbr --add ll "exa -la"
 
 
 source ~/.config/fish/local/local.fish
