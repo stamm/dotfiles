@@ -34,6 +34,13 @@ set PATH ~/.rbenv/shims $PATH
 # status --is-interactive; and source (rbenv init -|psub)
 set PATH /usr/local/opt/grep/libexec/gnubin $PATH
 
+
+# status --is-interactive; and source (pyenv init -|psub)
+#source (brew --prefix asdf)/asdf.fish
+set -x GRPC_PYTHON_BUILD_SYSTEM_ZLIB true
+source /usr/local/opt/asdf/asdf.fish
+
+
 set GPG_TTY (tty)
 
 set -x OBJC_DISABLE_INITIALIZE_FORK_SAFETY YES
