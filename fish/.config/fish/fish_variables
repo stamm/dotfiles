@@ -1,10 +1,13 @@
 # This file contains fish universal variable definitions.
 # VERSION: 3.0
 SETUVAR FZF_DEFAULT_OPTS:\x2d\x2dheight\x2040\x25
+SETUVAR FZF_DISABLE_KEYBINDINGS:0
 SETUVAR FZF_LEGACY_KEYBINDINGS:1
 SETUVAR FZF_PREVIEW_DIR_CMD:ls
 SETUVAR FZF_PREVIEW_FILE_CMD:head\x20\x2dn\x2010
 SETUVAR FZF_TMUX_HEIGHT:40\x25
+SETUVAR --export SSH_AGENT_PID:1666
+SETUVAR --export SSH_AUTH_SOCK:/var/folders/kz/82f9s_vd7hxdd5gyxh4zkw8c0000gn/T//ssh\x2dR3h2DSqbhVe3/agent\x2e1665
 SETUVAR __fish_init_2_39_8:\x1d
 SETUVAR __fish_init_2_3_0:\x1d
 SETUVAR __fish_init_3_x:\x1d
@@ -23,6 +26,10 @@ SETUVAR _fish_abbr_kdra:kubectl\x20drain\x20\x2d\x2dignore\x2ddaemonsets
 SETUVAR _fish_abbr_ke:kubectl\x20exec\x20\x2dit
 SETUVAR _fish_abbr_kg:kubectl\x20get
 SETUVAR _fish_abbr_kgcma:kubectl\x20get\x20cm\x20\x2dA
+SETUVAR _fish_abbr_kgd:kubectl\x20get\x20deploy\x20\x2do\x20wide
+SETUVAR _fish_abbr_kgda:kubectl\x20get\x20deploy\x20\x2dA\x20\x2do\x20wide
+SETUVAR _fish_abbr_kgdal:kubectl\x20get\x20deploy\x20\x2dA\x20\x2dowide\x20\x2dl\x20app\x2ekubernetes\x2eio/name\x3d
+SETUVAR _fish_abbr_kgdl:kubectl\x20get\x20deploy\x20\x2dowide\x20\x2dl\x20app\x2ekubernetes\x2eio/name\x3d
 SETUVAR _fish_abbr_kgi:kubectl\x20get\x20ing
 SETUVAR _fish_abbr_kgia:kubectl\x20get\x20ing\x20\x2dA\x20\x2do\x20wide
 SETUVAR _fish_abbr_kgn:kubectl\x20get\x20no\x20\x2do\x20wide
@@ -37,7 +44,7 @@ SETUVAR _fish_abbr_kn:kubens
 SETUVAR _fish_abbr_kstg:kubectl\x20\x2d\x2dcontext\x3do\x2ddev
 SETUVAR _fish_abbr_ku:kubectl\x20uncordon
 SETUVAR _fish_abbr_kx:kubectx
-SETUVAR _fish_abbr_ll:exa\x20\x2dl
+SETUVAR _fish_abbr_ll:exa\x20\x2dlaB
 SETUVAR _fish_abbr_mux:tmuxinator
 SETUVAR _fish_abbr_o3ch:curl\x20\x2d\x2dlocation\x20\x2d\x2drequest\x20POST\x20\x22https\x3a//hooks\x2eslack\x2ecom/services/T037ZKH7E/B015J5J1QFM/P50vMuAamDTv1iNnpqNBhUfE\x22\x20\x2d\x2dheader\x20\x22Content\x2dType\x3a\x20application/json\x22\x20\x2d\x2ddata\x2draw\x20\x27\x7b\x22text\x22\x3a\x20\x22\x22\x7d\x27
 SETUVAR _fish_abbr_q:qbec
@@ -50,6 +57,11 @@ SETUVAR _fish_abbr_setgo19:ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e9\x2e2\x
 SETUVAR _fish_abbr_setgotip:ln\x20\x2dnfs\x20/usr/local/go_versions/tip\x20/usr/local/go_versions/current
 SETUVAR _fish_abbr_v:vault
 SETUVAR _fish_abbr_vim:nvim
+SETUVAR _fisher_evanlucas_2F_fish_2D_kubectl_2D_completions_files:/Users/stamm/\x2econfig/fish/completions/kubectl\x2efish
+SETUVAR _fisher_fisherman_2F_fzf_files:/Users/stamm/\x2econfig/fish/functions/__fzf_cd\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_complete\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_complete_preview\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_find_file\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_get_dir\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_open\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_parse_commandline\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzf_reverse_isearch\x2efish\x1e/Users/stamm/\x2econfig/fish/functions/__fzfcmd\x2efish\x1e/Users/stamm/\x2econfig/fish/conf\x2ed/fzf\x2efish
+SETUVAR _fisher_jorgebucaran_2F_fisher_files:/Users/stamm/\x2econfig/fish/functions/fisher\x2efish\x1e/Users/stamm/\x2econfig/fish/completions/fisher\x2efish
+SETUVAR _fisher_plugins:fisherman/fzf\x1eevanlucas/fish\x2dkubectl\x2dcompletions\x1erbenv/fish\x2drbenv\x1ejorgebucaran/fisher
+SETUVAR _fisher_rbenv_2F_fish_2D_rbenv_files:/Users/stamm/\x2econfig/fish/functions/rbenv\x2efish\x1e/Users/stamm/\x2econfig/fish/conf\x2ed/rbenv\x2efish\x1e/Users/stamm/\x2econfig/fish/completions/rbenv\x2efish
 SETUVAR fish_color_autosuggestion:4c566a
 SETUVAR fish_color_cancel:\x2dr
 SETUVAR fish_color_command:81a1c1
@@ -80,5 +92,6 @@ SETUVAR fish_pager_color_description:B3A06D\x1eyellow
 SETUVAR fish_pager_color_prefix:white\x1e\x2d\x2dbold\x1e\x2d\x2dunderline
 SETUVAR fish_pager_color_progress:brwhite\x1e\x2d\x2dbackground\x3dcyan
 SETUVAR fish_user_abbreviations:vim\x20nvim\x1ek\x20kubectl\x1ekcd\x20kubectl\x20config\x20set\x2dcontext\x20\x28kubectl\x20config\x20current\x2dcontext\x29\x20\x2d\x2dnamespace\x20\x1esetgo15\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e5\x2e3\x20/usr/local/go_versions/current\x1esetgo16\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e6\x2e4\x20/usr/local/go_versions/current\x1esetgo17\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e7\x2e5\x20/usr/local/go_versions/current\x1esetgo18\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e8\x2e5\x20/usr/local/go_versions/current\x1esetgo19\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e9\x2e2\x20/usr/local/go_versions/current\x1esetgo110\x20ln\x20\x2dnfs\x20/usr/local/go_versions/1\x2e10beta1\x20/usr/local/go_versions/current\x1esetgotip\x20ln\x20\x2dnfs\x20/usr/local/go_versions/tip\x20/usr/local/go_versions/current\x1ekx\x20kubectx\x1ekgp\x20kubectl\x20get\x20po\x1ekgs\x20kubectl\x20get\x20svc\x1ekgi\x20kubectl\x20get\x20ing\x1emux\x20tmuxinator\x1ekn\x20kubens\x1ekstg\x20kubectl\x20\x2d\x2dcontext\x3do\x2ddev\x1eg\x20git\x1ekgpa\x20kubectl\x20get\x20po\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide\x1ekgsa\x20kubectl\x20get\x20svc\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide\x1ekgia\x20kubectl\x20get\x20ing\x20\x2d\x2dall\x2dnamespaces\x20\x2dowide\x1ekg\x20kubectl\x20get\x1ebe\x20bundle\x20exec
+SETUVAR fish_user_paths:/usr/local/go_versions/current/bin\x1e/usr/local/sbin\x1e/usr/local/bin\x1e/usr/bin\x1e/bin\x1e/usr/sbin\x1e/sbin\x1e/Users/stamm/\x2ebin\x1e/usr/local/opt/grep/libexec/gnubin\x1e/Users/stamm/\x2erbenv/shims\x1e/Users/stamm/\x2ekrew/bin\x1e/Users/stamm/go/bin
 SETUVAR fisher_dependency_count:fzf
-SETUVAR grc_plugin_execs:cat\x1ecvs\x1edf\x1ediff\x1edig\x1egcc\x1eg\x2b\x2b\x1els\x1eifconfig\x1emake\x1emount\x1emtr\x1enetstat\x1eping\x1eps\x1etail\x1etraceroute\x1ewdiff\x1eblkid\x1edu\x1ednf\x1edocker\x1edocker\x2dmachine\x1eenv\x1eid\x1eip\x1eiostat\x1elast\x1elsattr\x1elsblk\x1elspci\x1elsmod\x1elsof\x1egetfacl\x1egetsebool\x1eulimit\x1euptime\x1enmap\x1efdisk\x1efindmnt\x1efree\x1esemanage\x1esar\x1ess\x1esysctl\x1esystemctl\x1estat\x1eshowmount\x1etcpdump\x1etune2fs\x1evmstat\x1ew\x1ewho
+SETUVAR grc_plugin_execs:cat\x1ecvs\x1edf\x1ediff\x1edig\x1egcc\x1eg\x2b\x2b\x1els\x1eifconfig\x1emake\x1emount\x1emtr\x1enetstat\x1eping\x1eps\x1etail\x1etraceroute\x1ewdiff\x1eblkid\x1edu\x1ednf\x1edocker\x1edocker\x2dcompose\x1edocker\x2dmachine\x1eenv\x1eid\x1eip\x1eiostat\x1ejournalctl\x1ekubectl\x1elast\x1elsattr\x1elsblk\x1elspci\x1elsmod\x1elsof\x1egetfacl\x1egetsebool\x1eulimit\x1euptime\x1enmap\x1efdisk\x1efindmnt\x1efree\x1esemanage\x1esar\x1ess\x1esysctl\x1esystemctl\x1estat\x1eshowmount\x1etcpdump\x1etune2fs\x1evmstat\x1ew\x1ewho\x1esockstat
