@@ -4,16 +4,17 @@ call plug#begin('~/.config/nvim/plugged/')
 	" Plug 'garyburd/go-explorer'
 	"Plug 'Shougo/neocomplete.vim'
 	if has('nvim')
-		Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-		Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
+		" Plug 'autozimu/LanguageClient-neovim', {
+    " \ 'branch': 'next',
+    " \ 'do': 'bash install.sh',
+    " \ }
+		" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+		" Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
 	else
 		Plug 'Valloric/YouCompleteMe'
 	endif
 	Plug 'fatih/vim-go', { 'tag': '*', 'do': ':GoUpdateBinaries' }
+	" Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 	", { 'tag': '*' }
 	" Plug 'AndrewRadev/splitjoin.vim'
 	Plug 'SirVer/ultisnips', { 'tag': '*' }
@@ -25,13 +26,13 @@ call plug#begin('~/.config/nvim/plugged/')
 	" Plug 'mileszs/ack.vim'
 	Plug 'scrooloose/nerdtree'
 	" Plug 'vim-ctrlspace/vim-ctrlspace'
-	Plug 'tpope/vim-fugitive'
+	" Plug 'tpope/vim-fugitive'
+	" Plug 'airblade/vim-gitgutter'
 	Plug 'w0rp/ale'
 	Plug 'bling/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
 	Plug 'tpope/vim-commentary'
-	Plug 'mhinz/vim-grepper'
-	Plug 'airblade/vim-gitgutter'
+	Plug 'mhinz/vim-grepper', { 'on': ['Grepper', '<plug>(GrepperOperator)'] }
 	Plug 'MattesGroeger/vim-bookmarks'
 
 	" if has('nvim')
@@ -47,7 +48,13 @@ call plug#begin('~/.config/nvim/plugged/')
 	" Plug 'artur-shaik/vim-javacomplete2'
 	Plug 'google/vim-jsonnet'
 	Plug 'tsandall/vim-rego'
+	" Plug 'ActivityWatch/aw-watcher-vim'
+	Plug 'phaazon/hop.nvim'
+	" Plug 'norcalli/nvim-colorizer.lua'
+	Plug 'nvim-lua/plenary.nvim'
+	Plug 'lewis6991/gitsigns.nvim'
 call plug#end()
+
 
 " let g:python2_host_prog = '/usr/local/bin/python'
 let g:python2_host_prog = '/usr/local/bin/python'
@@ -82,7 +89,8 @@ set undodir=~/.config/nvim/.undo
 let g:rehash256 = 1
 " let g:molokai_original = 1
 colorscheme nord
-highlight LineNr ctermfg=grey
+hi Comment ctermfg=247
+" highlight LineNr ctermfg=grey
 " }}}
 
 let mapleader = ","
@@ -120,7 +128,7 @@ set shiftround    " use multiple of shiftwidth when indenting with '<' and '>'
 set scrolloff=4   " keep 4 lines off the edges of the screen when scrolling
 set virtualedit=all             " allow the cursor to go in to "invalid" places
 
-set foldlevelstart=1
+set foldlevelstart=99
 
 nnoremap / /\v
 vnoremap / /\v
@@ -170,6 +178,7 @@ let g:airline#extensions#virtualenv#enabled = 0
 
 " let g:airline_section_x = '%#goStatuslineColor#%{go#statusline#Show()}%*'
 let g:airline_section_y = '%{go#statusline#Show()}'
+let g:airline_section_b = '%{get(b:,"gitsigns_head","")}'
 if !exists('g:airline_symbols')
 	let g:airline_symbols = {}
 endif
@@ -286,7 +295,7 @@ let g:ctrlp_max_files=0     " do not limit the number of searchable files
 let g:grepper = {
 	\ 'tools': ['rg', 'ag'],
 	\ 'rg': {
-	\ 'grepprg': 'rg --no-ignore-vcs --no-heading --color=never --line-number --column --sort-files',
+	\ 'grepprg': 'rg --no-ignore-vcs --no-heading --color=never --line-number --column --sort-files $* .',
 	\ },
 	\ 'ag': {
 	\   'grepprg': 'ag -U --vimgrep --nogroup --nocolor',
@@ -352,7 +361,7 @@ filetype on
 " Go file settings ---------------------- {{{
 augroup filetype_go
 	au!
-	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=1
+	autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2 foldmethod=syntax foldlevel=99
 	autocmd BufNewFile,BufRead *.go setfiletype go
 	" autocmd FileType go nmap <leader>gb  <Plug>(go-build)
 	" autocmd FileType go nmap <leader>gr  <Plug>(go-run)
@@ -362,7 +371,7 @@ augroup filetype_go
 	" autocmd FileType go nmap <leader>gl  <Plug>(go-metalinter)
 	autocmd FileType go nmap <Leader>gi <Plug>(go-info)
 	" autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-	autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
+	" autocmd FileType go nnoremap <silent> <Leader>mb :execute "make build"<CR>
 	autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 
 	autocmd BufNewFile,BufRead glide.lock set filetype=yaml
@@ -405,7 +414,7 @@ set completeopt-=preview
 set completeopt+=noinsert
 " deoplete.nvim recommend
 set completeopt+=noselect
-if has('nvim')
+if 0 && has('nvim')
 	let g:deoplete#enable_at_startup = 1
 	call deoplete#custom#option({
 	\ 'auto_complete_start_length': 2,
@@ -442,7 +451,11 @@ endfunction
 " Ale {{{
 " let g:ale_set_highlights = 0
 let g:airline#extensions#ale#enabled = 1
-let g:ale_go_langserver_executable = 'gopls'
+set omnifunc=ale#completion#OmniFunc
+let g:ale_completion_enabled = 1
+let g:ale_linters = {
+  \ 'go': ['gopls'],
+  \}
 " }}}
 
 " UltiSnips {{{
@@ -550,4 +563,14 @@ autocmd Syntax * syn match ExtraWhitespace /\s\+$\| \+\ze\\t/
 " keymap layoutts
 nnoremap <silent> <leader>kq :set langmap=""<cr>
 nnoremap <silent> <leader>kb :set langmap=dstn;hjkl<cr>
+
+lua require'hop'.setup()
+nnoremap <leader>h :lua require'hop'.hint_words()
+
+lua require('gitsigns').setup({numhl = true, current_line_blame = true})
+au TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=150, on_visual=true}
+
+
+" set termguicolors
+" lua require'colorizer'.setup()
 
