@@ -73,4 +73,13 @@ for key, app in pairs(applicationHotkeys) do
   end)
 end
 
+
+hs.hotkey.bind({}, "F16", function()
+    hs.keycodes.setLayout("English - Ilya Birman Typography")
+end)
+
+hs.hotkey.bind({}, "F17", function()
+    hs.keycodes.setLayout("Russian - Ilya Birman Typography")
+end)
+
 hs.alert.show("Config loaded")
