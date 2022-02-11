@@ -16,7 +16,6 @@
 	path = config-work
 [core]
 	excludesfile = /Users/stamm/.config/git/ignore
-	autocrlf = input
 	pager = less -x2
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
@@ -42,3 +41,6 @@
 	insteadOf = https://gitlab.ozon.ru/
 [pull]
 	rebase = true
+[maintenance]
+	repo = /Users/stamm/code/github/kubernetes/kubernetes
+	repo = /Volumes/Linux/stable
