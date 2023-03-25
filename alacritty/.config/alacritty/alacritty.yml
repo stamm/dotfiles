@@ -75,6 +75,10 @@ window:
   # class: Alacritty
   dynamic_title: true
 
+
+  # Send ESC (\x1b) before characters when alt is pressed.
+  option_as_alt: None
+
 scrolling:
   # Maximum number of lines in the scrollback buffer.
   # Specifying '0' will disable scrolling.
@@ -109,7 +113,7 @@ scrolling:
 font:
   normal:
     # family: Droid Sans Mono Slashed for Powerline
-    family: FuraCode Nerd Font Mono
+    family: FiraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
     style: Retina
@@ -117,7 +121,7 @@ font:
   # The bold font face
   bold:
     # family: Droid Sans Mono Slashed for Powerline
-    family: FuraCode Nerd Font Mono
+    family: FiraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
     style: Bold
@@ -125,7 +129,7 @@ font:
   # The italic font face
   italic:
     # family: Droid Sans Mono Slashed for Powerline
-    family: FuraCode Nerd Font Mono
+    family: FiraCode Nerd Font Mono
     # family: JetBrains Mono
     # Style can be specified to pick a specific face.
     # style: Italic# Normal (roman) font face
@@ -196,7 +200,7 @@ font:
   #
   # This is a global setting and will require a log out or restart to take
   # effect.
-  use_thin_strokes: true
+  # use_thin_strokes: true
 
 # If `true`, bold text is drawn using the bright color variants.
 draw_bold_text_with_bright_colors: true
@@ -364,9 +368,6 @@ working_directory: None
 # Alacritty will fall back to the WinPTY automatically if the ConPTY
 # backend cannot be initialized.
 enable_experimental_conpty_backend: false
-
-# Send ESC (\x1b) before characters when alt is pressed.
-alt_send_esc: false
 
 debug:
   # Display the time it takes to redraw each frame.
