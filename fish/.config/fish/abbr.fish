@@ -34,6 +34,7 @@ abbr --add kgcma "kubectl get cm -A"
 abbr --add be "bundle exec"
 
 abbr --add g "git"
+abbr --add gl "git log -p --stat"
 abbr --add gc "git commit"
 abbr --add gp "git pull --rebase"
 
