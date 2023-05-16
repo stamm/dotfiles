@@ -85,6 +85,7 @@ local applicationHotkeys = {
   m = 'Mail',
   c = 'Calendar',
   b = 'Bitwarden',
+  v = 'VSCodium',
 }
 for key, app in pairs(applicationHotkeys) do
   hs.hotkey.bind(hyper, key, function()
