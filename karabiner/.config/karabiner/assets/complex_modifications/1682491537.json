@@ -1,0 +1,1 @@
+{"title":"caps to ctrl+b","rules":[{"description":"caps to ctrl+b","manipulators":[{"type":"basic","from":{"key_code":"caps_lock"},"to":[{"repeat":true,"key_code":"b","modifiers":["left_control"]}]}]}]}

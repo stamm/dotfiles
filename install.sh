@@ -11,3 +11,4 @@ stow cheat
 stow hammerspoon
 stow starship
 stow nnn
+stow karabiner
