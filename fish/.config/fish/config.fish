@@ -1,7 +1,10 @@
 set -x LC_ALL en_US.UTF-8
 
+set -U fish_greeting
+
 source $__fish_config_dir/go.fish
 
+fish_add_path -g /opt/homebrew/bin
 fish_add_path /usr/local/sbin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
 fish_add_path -a $GOPATH/bin $HOME/.krew/bin
 fish_add_path -p $GOROOT/bin $HOME/Downloads/flutter/bin $HOME/.bin $HOME/.rbenv/shims /usr/local/opt/grep/libexec/gnubin
@@ -41,7 +44,8 @@ bind \cx edit_command_buffer
 if [ $TERM != "screen-256color" ]
   tmux has-session -t base;
   if [ $status != 0 ]
-    tmux new -s base
+    tmuxinator s base
   end
   tmux attach -t base;
 end
+
