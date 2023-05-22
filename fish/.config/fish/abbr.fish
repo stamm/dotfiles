@@ -36,6 +36,7 @@ abbr --add be "bundle exec"
 abbr --add g "git"
 abbr --add gl "git log -p --stat"
 abbr --add gc "git commit"
+abbr --add gd "git diff"
 abbr --add gp "git pull --rebase"
 
 abbr --add ll "exa -laB"
