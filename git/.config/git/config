@@ -2,21 +2,12 @@
 	name = Rustam Zagirov
 	email = stammru@gmail.com
 	signingkey = 809B393BBA188BCA
-[includeIf "gitdir:~/code/ozon/**/"]
-	path = config-work
-[includeIf "gitdir:/tmp/**/"]
-	path = config-work
-[includeIf "gitdir:~/code/go/src/godep.ozon.ru/**/"]
-	path = config-work
-[includeIf "gitdir:~/code/go/src/gitlab.ozon.ru/**/"]
-	path = config-work
-[includeIf "gitdir:~/code/github/numtaba/**/"]
-	path = config-work
-[includeIf "gitdir:~/code/envoy/**/"]
-	path = config-work
+[includeIf "gitdir:~/code/gitlab.sbmt.io/**/"]
+	path = config-sbmt
 [core]
 	excludesfile = /Users/stamm/.config/git/ignore
 	pager = less -x2
+	; hookspath = /Users/zagirov.rn/.git_settings/hooks
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
@@ -37,8 +28,8 @@
 	helper = osxkeychain
 [url "git@github.com:"]
 	insteadOf = https://github.com/
-[url "git@gitlab.ozon.ru:"]
-	insteadOf = https://gitlab.ozon.ru/
+[url "git@gitlab.sbmt.io:"]
+	insteadOf = https://gitlab.sbmt.io/
 [pull]
 	rebase = true
 [maintenance]
