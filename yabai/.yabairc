@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-yabai -m config external_bar          all:26:0
+yabai -m config external_bar          all:30:0
 # global settings
 yabai -m config mouse_follows_focus          on
 yabai -m config focus_follows_mouse          autofocus
@@ -29,7 +29,7 @@ yabai -m config right_padding                0
 yabai -m config window_gap                   0
 
 
-yabai -m config window_border on
+yabai -m config window_border off
 yabai -m config window_border_width 6
 yabai -m config active_window_border_color 0xff775759
 yabai -m config normal_window_border_color 0xff555555
@@ -41,6 +41,7 @@ yabai -m rule --add label=cisco-vpn app="Microsoft Remote Desktop" manage=off la
 yabai -m rule --add label=licecap app="licecap" manage=off layer=above
 yabai -m rule --add label=vlc app="VLC" manage=off layer=above border=off
 yabai -m rule --add label=allacritty app="Alacritty" border=off
+yabai -m rule --add label=settings app="System Settings" border=off manage=off
 
 
 # yabai -m signal --add event=space_changed \
