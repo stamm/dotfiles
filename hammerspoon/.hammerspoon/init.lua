@@ -28,9 +28,11 @@ end)
 for i, eth in pairs(hs.network.interfaces()) do
   if eth == "en7" then
     -- hs.alert.show("en7")
-    for i, net in pairs(hs.network.interfaceDetails(eth)["IPv4"].Addresses) do
-      if net == "192.168.120.13" then
-	-- hs.alert.show("home net")
+    if not hs.network.interfaceDetails(eth) == nil then
+      for i, net in pairs(hs.network.interfaceDetails(eth)["IPv4"].Addresses) do
+	if net == "192.168.120.13" then
+	  -- hs.alert.show("home net")
+	end
       end
     end
   end
