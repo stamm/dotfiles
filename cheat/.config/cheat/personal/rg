@@ -4,10 +4,8 @@ tags: [ text ]
 
 # List matching files only
 -l str
-
 # Count matching in files
--l str
-
+-c str
 # Sort
 ‐‐sort path|modified|accessed|created str
 
@@ -24,12 +22,9 @@ tags: [ text ]
 # Gzip, etcd
 -z str
 
-# Search in type list
--t sh
-
-# Exclude in type list
--T sh
-
-
 # Print type list
---type-list 
+--type-list
+# Search in type list
+-t sh str
+# Exclude in type list
+-T sh str
