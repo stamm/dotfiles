@@ -1,0 +1,6 @@
+---
+syntax: bash
+---
+
+# Show commit
+git log -p v5.19.. -- kernel/sched/ include/linux/sched/ Documentation/scheduler kernel/softirq.c net/netfilter/ipvs/ net/ipv4/ drivers/net/ethernet/intel/i40e net/sched fs/proc/ fs/kernfs/ kernel/cgroup/ include/linux/kernfs.h
