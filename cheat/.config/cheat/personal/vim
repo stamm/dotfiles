@@ -12,6 +12,9 @@ gv — previous
 
 v_o, v_O
 
+# Moving page around cursor
+zt, zz, zb - move to up, center, bottom
+
 # Folding
 zf - F-old creation
 zo - O-pen fold
