@@ -5,10 +5,10 @@ function setgo
 	case 18
 		set go_version 1.18.10
 	case 19
-		set go_version 1.19.9
+		set go_version 1.19.10
 		ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/1.19
 	case 20
-		set go_version 1.20.4
+		set go_version 1.20.5
 		ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/1.20
 	case tip
 		set go_version tip
