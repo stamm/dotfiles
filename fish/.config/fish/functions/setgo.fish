@@ -5,11 +5,14 @@ function setgo
 	case 18
 		set go_version 1.18.10
 	case 19
-		set go_version 1.19.10
+		set go_version 1.19.12
 		ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/1.19
 	case 20
-		set go_version 1.20.5
+		set go_version 1.20.7
 		ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/1.20
+	case 21
+		set go_version 1.21.0
+		ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/1.21
 	case tip
 		set go_version tip
 	case '*'
@@ -19,4 +22,4 @@ function setgo
 	ln -nfs /usr/local/go_versions/$go_version /usr/local/go_versions/current
 end
 
-complete -c setgo -x -a "17 18 19 20 tip"
+complete -c setgo -x -a "17 18 19 20 21 tip"
