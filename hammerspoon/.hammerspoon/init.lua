@@ -77,25 +77,25 @@ end
 -- screenWatcher:start()
 -- screenChangedCallback()
 
-local hyper = { "cmd", "alt", "ctrl", "shift" }
-hs.hotkey.bind(hyper, "Y", hs.toggleConsole)
-local applicationHotkeys = {
-  f = 'Firefox Nightly',
-  a = 'Alacritty',
-  d = 'Discord',
-  t = 'Telegram',
-  m = 'Mail',
-  c = 'Calendar',
-  b = 'Bitwarden',
-  v = 'VSCodium',
-}
-for key, app in pairs(applicationHotkeys) do
-  hs.hotkey.bind(hyper, key, function()
-    if not hs.application.launchOrFocus(app) then
-      hs.alert.show("err")
-    end
-  end)
-end
+-- local hyper = { "cmd", "alt", "ctrl", "shift" }
+-- hs.hotkey.bind(hyper, "Y", hs.toggleConsole)
+-- local applicationHotkeys = {
+--   f = 'Firefox Nightly',
+--   a = 'Alacritty',
+--   d = 'Discord',
+--   t = 'Telegram',
+--   m = 'Mail',
+--   c = 'Calendar',
+--   b = 'Bitwarden',
+--   v = 'VSCodium',
+-- }
+-- for key, app in pairs(applicationHotkeys) do
+--   hs.hotkey.bind(hyper, key, function()
+--     if not hs.application.launchOrFocus(app) then
+--       hs.alert.show("err")
+--     end
+--   end)
+-- end
 
 -- local mic = hs.audiodevice.defaultInputDevice();
 -- mic:watcherCallback(function(uuid, event_name, scope, element) print(uuid, event_name, scope, element) end)
@@ -141,13 +141,13 @@ end
 
 
 
--- hs.hotkey.bind({}, "F16", function()
---   hs.keycodes.setLayout("English - Ilya Birman Typography")
--- end)
+hs.hotkey.bind({}, "F16", function()
+  hs.keycodes.setLayout("U.S.")
+end)
 
--- hs.hotkey.bind({}, "F17", function()
---   hs.keycodes.setLayout("Russian - Ilya Birman Typography")
--- end)
+hs.hotkey.bind({}, "F17", function()
+  hs.keycodes.setLayout("Russian – PC")
+end)
 
 -- hs.grid.show()
 hs.alert.show("Config loaded")
