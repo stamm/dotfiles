@@ -39,4 +39,4 @@ abbr --add gc "git commit"
 abbr --add gd "git diff"
 abbr --add gp "git pull --rebase"
 
-abbr --add ll "exa -laB"
+abbr --add ll "eza -laB"
