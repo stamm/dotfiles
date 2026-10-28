@@ -2,3 +2,5 @@
 /nvim/.config/nvim/.swapfiles
 /fish/.config/fish/local/
 /git/.config/git/config-sbmt
+# opencode-go: service-account ключ и секреты (не коммитить)
+/sketchybar/.config/sketchybar/opencode-go.env

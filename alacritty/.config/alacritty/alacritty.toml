@@ -686,7 +686,7 @@ save_to_clipboard = true
 semantic_escape_chars = ''',│`|:"' ()[]{}<>'''
 
 [window]
-decorations = "buttonless"
+# decorations = "buttonless"
 dynamic_padding = false
 dynamic_title = true
 opacity = 1.0

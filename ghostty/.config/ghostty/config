@@ -1,0 +1,4 @@
+copy-on-select = clipboard
+cursor-opacity = 0.8
+mouse-hide-while-typing = true
+confirm-close-surface = false
