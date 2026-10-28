@@ -108,30 +108,68 @@ sketchybar --add item cliamp right \
            --subscribe cliamp mouse.clicked mouse.scrolled
 
 ##### opencode go usage #####
-# Проценты rolling/weekly/monthly подписки OpenCode Go. При наведении — popup
-# с подробностями (процент, остаток, время сброса). Данные тянет плагин.
-# Попап закрывается, когда мышь покидает бар (mouse.exited.global), поэтому
-# его можно спокойно читать, ведя курсор вниз.
+# Проценты rolling/weekly/monthly подписки OpenCode Go. По клику — popup
+# с подробностями (точный процент, суммы в $, время сброса), темпом, прогнозом
+# месяца, спарклайном дневного расхода и разбивкой по моделям. Данные тянет
+# плагин.
+# Левый клик открывает/закрывает попап; он также закрывается, когда мышь
+# покидает бар (mouse.exited.global), поэтому его можно спокойно читать,
+# ведя курсор вниз.
 
-sketchybar --add item opencode_go right \
+# ВАЖНО: на правой стороне SketchyBar рисует items в порядке, ОБРАТНОМ порядку
+# добавления (первым добавленный — правее). Поэтому значения окон добавляем до
+# anchor'а и в обратном порядке (M, W, R), чтобы на экране было [chip] R W M.
+# Буква окна — мелким приглушённым иконкой, число — крупным цветным label.
+sketchybar --add item opencode_go.m right \
+           --set opencode_go.m y_offset=1 icon=M icon.drawing=on icon.color=0xff7f849c \
+                 icon.font="Hack Nerd Font:Bold:10.0" label.font="Hack Nerd Font:Bold:14.0" \
+                 padding_left=0 padding_right=0 \
+                 icon.padding_left=0 icon.padding_right=0 \
+                 label.padding_left=0 label.padding_right=6 \
+                 script="$PLUGIN_DIR/opencode-go.sh" \
+           --subscribe opencode_go.m mouse.clicked mouse.exited.global \
+           --add item opencode_go.w right \
+           --set opencode_go.w y_offset=1 icon=W icon.drawing=on icon.color=0xff7f849c \
+                 icon.font="Hack Nerd Font:Bold:10.0" label.font="Hack Nerd Font:Bold:14.0" \
+                 padding_left=0 padding_right=0 \
+                 icon.padding_left=0 icon.padding_right=0 \
+                 label.padding_left=0 label.padding_right=6 \
+                 script="$PLUGIN_DIR/opencode-go.sh" \
+           --subscribe opencode_go.w mouse.clicked mouse.exited.global \
+           --add item opencode_go.r right \
+           --set opencode_go.r y_offset=1 icon=R icon.drawing=on icon.color=0xff7f849c \
+                 icon.font="Hack Nerd Font:Bold:10.0" label.font="Hack Nerd Font:Bold:14.0" \
+                 padding_left=0 padding_right=0 \
+                 icon.padding_left=0 icon.padding_right=0 \
+                 label.padding_left=0 label.padding_right=6 \
+                 script="$PLUGIN_DIR/opencode-go.sh" \
+           --subscribe opencode_go.r mouse.clicked mouse.exited.global \
+           --add item opencode_go right \
            --set opencode_go update_freq=60 \
                  y_offset=1 \
-                 label="…" \
+                 label.drawing=off \
                  script="$PLUGIN_DIR/opencode-go.sh" \
                  popup.align=right \
                  popup.background.color=0xcc1e1e2e \
                  popup.background.corner_radius=8 \
                  popup.blur_radius=30 \
-           --subscribe opencode_go mouse.entered mouse.exited.global \
+           --subscribe opencode_go mouse.clicked mouse.exited.global \
            --add item opencode_go.burn right \
            --set opencode_go.burn y_offset=1 icon.drawing=off label="" \
                  label.font="Hack Nerd Font:Bold:13.0" \
            --add item opencode_go.rolling popup.opencode_go \
-           --set opencode_go.rolling icon.drawing=off \
+           --set opencode_go.rolling icon.drawing=off label.align=left \
            --add item opencode_go.weekly popup.opencode_go \
-           --set opencode_go.weekly icon.drawing=off \
+           --set opencode_go.weekly icon.drawing=off label.align=left \
            --add item opencode_go.monthly popup.opencode_go \
-           --set opencode_go.monthly icon.drawing=off \
+           --set opencode_go.monthly icon.drawing=off label.align=left \
+           --add item opencode_go.pace popup.opencode_go \
+           --set opencode_go.pace drawing=off icon.drawing=off label.align=left \
+           --add item opencode_go.forecast popup.opencode_go \
+           --set opencode_go.forecast drawing=off icon.drawing=off label.align=left \
+           --add item opencode_go.spark popup.opencode_go \
+           --set opencode_go.spark drawing=off icon.drawing=off label.align=left \
+                 label.font="Hack Nerd Font Mono:Bold:14.0" \
            --add item opencode_go.models_title popup.opencode_go \
            --set opencode_go.models_title drawing=off icon.drawing=off label.align=left \
            --add item opencode_go.model_head popup.opencode_go \

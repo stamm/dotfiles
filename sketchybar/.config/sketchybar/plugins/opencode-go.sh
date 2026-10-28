@@ -2,40 +2,48 @@
 
 # opencode-go.sh — использование подписки OpenCode Go в SketchyBar.
 #
-# Источник: GET https://opencode.ai/inference/go/v1/usage
+# Источник: GET https://opencode.ai/console/api/go/status
 #   Authorization: Bearer <access-токен>  (берётся из opencode.db, таблица credential)
-# Ответ: {"usage":{"rolling":{"status","percent","resetsAt"}, "weekly":{...}, "monthly":{...}}}
+# Ответ: access.meters.{fiveHour,week,month} c usedMicroCents/limitMicroCents/resetsAt
+# (плюс startsAt у пятичасового и недельного окна) и access.{startsAt,endsAt}.
+# Одна сотая доллара = 1e6 microcents, то есть $ = microcents / 1e8.
 #
-# В баре: R{p}% W{p}% M{p}% (rolling/weekly/monthly), цвет — по худшему окну.
-# При наведении открывается popup с деталями (процент, остаток, время сброса)
-# и таблицей использования по моделям за диапазон (Console Usage API).
-# Опрос: update_freq=60 (см. sketchybarrc). События: mouse.entered, mouse.exited.global.
+# В баре: R{p}% W{p}% M{p}% (rolling/weekly/monthly) отдельными item'ами:
+# подписи R/W/M белые, цветом подсвечивается только число того окна, чей
+# процент дошёл до порога (по умолчанию 75 — жёлтый, 90 — красный).
+# Иконка-чип красится по худшему из трёх окон.
+# По клику открывается popup с деталями: точный процент, суммы в долларах
+# и время сброса, темп с начала окна, прогноз месяца к дате продления,
+# спарклайн дневного расхода и таблица использования по моделям за диапазон.
+# Опрос: update_freq=60 (см. sketchybarrc). События: mouse.clicked,
+# mouse.exited.global.
 #
 # Настройки через переменные окружения (или $CONFIG_DIR/opencode-go.env, chmod 600):
-#   OPENCODE_GO_TOKEN   Bearer-токен (иначе читается из БД OpenCode)
-#   OPENCODE_GO_ORG     workspace id  (x-opencode-org-id), необязательно
-#   OPENCODE_GO_URL     эндпоинт (по умолчанию .../inference/go/v1/usage)
-#   OPENCODE_GO_TTL     TTL кэша в секундах (по умолчанию 60)
-#   OPENCODE_GO_DB      путь к opencode.db
-#   OPENCODE_GO_SA_KEY  service-account ключ (oc_sk_...) для Console Usage API;
-#                       без него таблица по моделям скрывается
-#   OPENCODE_GO_CONSOLE_URL  хост консоли (по умолчанию https://opencode.ai/console)
-#   OPENCODE_GO_RANGE   диапазон usage/export: 24h|7d|30d (по умолчанию 30d)
-#   OPENCODE_GO_MODELS_TTL    TTL кэша CSV в секундах (по умолчанию 300)
-#   OPENCODE_GO_MODELS_LIMIT  сколько моделей показывать (по умолчанию 6)
-#   OPENCODE_GO_NAMES_TTL     TTL кэша имён models.dev в секундах (86400)
-#   OPENCODE_GO_COST_DIVISOR  делитель cost (auto|число; по умолчанию auto)
-#   OPENCODE_GO_BAR       полоса скорости сжигания 5ч-окна (1|0; по умолчанию 1)
-#   OPENCODE_GO_BAR_WIDTH ширина полосы в ячейках (по умолчанию 6)
-#   OPENCODE_GO_SLOPE_MIN окно наклона производной в минутах (по умолчанию 15)
-#   OPENCODE_GO_SUSTAIN   «устойчивый» темп, он же 1×, %/ч (по умолчанию 20)
-#   OPENCODE_GO_HISTORY   файл истории сэмплов rolling.percent
-#                         (по умолчанию ~/.local/state/opencode-go/rolling.tsv)
-#   DRY_RUN=1           печатать команды sketchybar вместо применения
+#   OPENCODE_GO_TOKEN       Bearer-токен (иначе читается из БД OpenCode)
+#   OPENCODE_GO_ORG         workspace id  (x-opencode-org-id), необязательно
+#   OPENCODE_GO_STATUS_API  эндпоинт статуса (по умолчанию .../console/api/go/status)
+#   OPENCODE_GO_TTL         TTL кэша статуса в секундах (по умолчанию 60)
+#   OPENCODE_GO_DB          путь к opencode.db
+#   OPENCODE_GO_CONSOLE_URL хост консоли (по умолчанию https://opencode.ai/console)
+#   OPENCODE_GO_USAGE_API   эндпоинт usage/models (по умолчанию .../api/usage/models)
+#   OPENCODE_GO_RANGE       диапазон usage/models: 24h|7d|30d|all (по умолчанию 30d)
+#   OPENCODE_GO_MODELS_TTL  TTL кэша usage/models в секундах (по умолчанию 300)
+#   OPENCODE_GO_MODELS_LIMIT сколько моделей показывать (по умолчанию 6)
+#   OPENCODE_GO_ACTIVITY_API эндпоинт дневного расхода Go (.../api/activity/go)
+#   OPENCODE_GO_ACTIVITY_TTL TTL кэша activity в секундах (по умолчанию 300)
+#   OPENCODE_GO_SPARK       спарклайн дневного расхода (1|0; по умолчанию 1)
+#   OPENCODE_GO_NAMES_TTL   TTL кэша имён models.dev в секундах (86400)
+#   OPENCODE_GO_WARN_PCT    порог жёлтой подсветки окна в баре (75)
+#   OPENCODE_GO_CRIT_PCT    порог красной подсветки окна в баре (90)
+#   OPENCODE_GO_BAR         полоса скорости сжигания 5ч-окна (1|0; по умолчанию 1)
+#   OPENCODE_GO_BAR_WIDTH   ширина полосы в ячейках (по умолчанию 6)
+#   OPENCODE_GO_SUSTAIN     «устойчивый» темп, он же 1×, %/ч (по умолчанию 20)
+#   DRY_RUN=1               печатать команды sketchybar вместо применения
 #
-# Полоса (item opencode_go.burn): показывает производную rolling.percent — скорость
-# сжигания в %/ч, нормированную на SUSTAIN. Середина полосы = 1× (100% ровно за 5 ч).
-# Цвет полосы — непрерывный градиент: зелёный (≤1×) → жёлтый (1.5×) → красный (≥2×).
+# Полоса (item opencode_go.burn): показывает средний темп с начала текущего
+# 5ч-окна — скорость сжигания в %/ч, нормированную на SUSTAIN. Середина полосы
+# = 1× (100% ровно за 5 ч). Цвет полосы — непрерывный градиент:
+# зелёный (≤1×) → жёлтый (1.5×) → красный (≥2×).
 
 set -u
 
@@ -43,31 +51,38 @@ CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
 [ -f "$CONFIG_DIR/opencode-go.env" ] && . "$CONFIG_DIR/opencode-go.env"
 
 NAME="${NAME:-opencode_go}"
+# Якорь попапа и иконки: при mouse-событии на opencode_go.r/.w/.m NAME содержит
+# точку, а попап висит на базовом item'е opencode_go.
+ROOT="${NAME%%.*}"
 TTL="${OPENCODE_GO_TTL:-60}"
-URL="${OPENCODE_GO_URL:-https://opencode.ai/inference/go/v1/usage}"
 DB="${OPENCODE_GO_DB:-${XDG_DATA_HOME:-$HOME/.local/share}/opencode/opencode.db}"
-CACHE="${TMPDIR:-/tmp}/sketchybar-opencode-go.json"
 
-# --- Разбивка по моделям: только Console Usage API (service-account ключ) ---
-# Данные серверные, поэтому учитывается использование с любого устройства.
-SA_KEY="${OPENCODE_GO_SA_KEY:-}"
+# --- Статус подписки Go: точные microcents по трём окнам ---
 CONSOLE_URL="${OPENCODE_GO_CONSOLE_URL:-https://opencode.ai/console}"
+STATUS_API="${OPENCODE_GO_STATUS_API:-$CONSOLE_URL/api/go/status}"
+STATUS_CACHE="${TMPDIR:-/tmp}/sketchybar-opencode-go-status.json"
+
+# --- Разбивка по моделям: Console Usage API (JSON) ---
+MODELS_API="${OPENCODE_GO_USAGE_API:-$CONSOLE_URL/api/usage/models}"
 USAGE_RANGE="${OPENCODE_GO_RANGE:-30d}"
 MODELS_TTL="${OPENCODE_GO_MODELS_TTL:-300}"
 MODELS_LIMIT="${OPENCODE_GO_MODELS_LIMIT:-6}"
 MODELS_MAX=8
-COST_DIV="${OPENCODE_GO_COST_DIVISOR:-auto}"
-USAGE_CACHE="${TMPDIR:-/tmp}/sketchybar-opencode-usage.csv"
+MODELS_CACHE="${TMPDIR:-/tmp}/sketchybar-opencode-models.json"
 NAMES_CACHE="${TMPDIR:-/tmp}/sketchybar-modelnames.json"
 NAMES_TSV="${TMPDIR:-/tmp}/sketchybar-modelnames.tsv"
 NAMES_TTL="${OPENCODE_GO_NAMES_TTL:-86400}"
 
+# --- Дневной расход Go: Console Activity API (JSON) ---
+ACTIVITY_API="${OPENCODE_GO_ACTIVITY_API:-$CONSOLE_URL/api/activity/go}"
+ACTIVITY_TTL="${OPENCODE_GO_ACTIVITY_TTL:-300}"
+ACTIVITY_CACHE="${TMPDIR:-/tmp}/sketchybar-opencode-activity.json"
+SPARK="${OPENCODE_GO_SPARK:-1}"
+
 # --- Полоса скорости сжигания 5ч-окна (rolling) ---
 BAR="${OPENCODE_GO_BAR:-1}"
 BAR_W="${OPENCODE_GO_BAR_WIDTH:-6}"
-SLOPE_MIN="${OPENCODE_GO_SLOPE_MIN:-15}"
 SUSTAIN="${OPENCODE_GO_SUSTAIN:-20}"
-HISTORY="${OPENCODE_GO_HISTORY:-${XDG_STATE_HOME:-$HOME/.local/state}/opencode-go/rolling.tsv}"
 
 # Иконки (Nerd Font). Задаются байтами UTF-8: POSIX sh не умеет \u-escape.
 ICON_GO="$(printf '\357\213\233')"    # U+F2DB nf-fa-microchip
@@ -77,7 +92,23 @@ ICON_WARN="$(printf '\357\201\261')"  # U+F071 nf-fa-warning
 C_GREEN="0xff98c379"
 C_YELLOW="0xffe5c07b"
 C_RED="0xffe06c75"
-C_HEAD="0xff7f849c"   # приглушённый — заголовок таблицы моделей
+C_HEAD="0xff7f849c"   # приглушённый — буквы окон, заголовок таблицы моделей
+# Числа окон: тот же оттенок, но полупрозрачный — визуально бледнее.
+C_VAL="0xbfb8bfc9"    # белый на ~75% альфы
+C_VAL_WARN="0xd0e5c07b"  # жёлтый
+C_VAL_CRIT="0xe0e06c75"  # красный
+
+# Иконка-чип в баре: цвет по худшему окну, но приглушённый (альфа ~70%).
+C_CHIP_OK="0xb398c379"
+C_CHIP_WARN="0xb3e5c07b"
+C_CHIP_CRIT="0xb3e06c75"
+
+# Пороги подсветки значений окон в баре (в процентах):
+# ниже WARN — белый, WARN..CRIT — жёлтый, CRIT и выше — красный.
+WARN_PCT="${OPENCODE_GO_WARN_PCT:-75}"
+CRIT_PCT="${OPENCODE_GO_CRIT_PCT:-90}"
+WARN_P10=$((WARN_PCT * 10))
+CRIT_P10=$((CRIT_PCT * 10))
 
 # RGB-каналы опорных цветов градиента (из C_GREEN/C_YELLOW/C_RED).
 G_R=0x98; G_G=0xc3; G_B=0x79
@@ -89,6 +120,11 @@ BLK_FULL="$(printf '\342\226\210')"   # U+2588 █
 BLK_EMPTY="$(printf '\342\226\221')"  # U+2591 ░
 BAR_L="$(printf '\342\226\217')"      # U+258F ▏
 BAR_R="$(printf '\342\226\225')"      # U+2595 ▕
+
+# Спарклайн: U+2581..U+2588, от низкого к высокому.
+SPARK_GLYPHS="$(printf '\342\226\201') $(printf '\342\226\202') $(printf '\342\226\203') $(printf '\342\226\204') $(printf '\342\226\205') $(printf '\342\226\206') $(printf '\342\226\207') $BLK_FULL"
+
+TAB="$(printf '\t')"
 
 sb() {
   if [ "${DRY_RUN:-0}" = "1" ]; then
@@ -102,19 +138,53 @@ sb() {
   fi
 }
 
-# Цвет по проценту использования.
-sev_color() {
+# Цвет по десятым долям процента (иконка-сводка и строки попапа).
+sev_color10() {
   case "$1" in
     ''|*[!0-9]*) printf '%s' "$C_GREEN" ;;
-    *) if [ "$1" -ge 80 ]; then printf '%s' "$C_RED"
-       elif [ "$1" -ge 50 ]; then printf '%s' "$C_YELLOW"
+    *) if [ "$1" -ge "$CRIT_P10" ]; then printf '%s' "$C_RED"
+       elif [ "$1" -ge "$WARN_P10" ]; then printf '%s' "$C_YELLOW"
        else printf '%s' "$C_GREEN"; fi ;;
+  esac
+}
+
+# Цвет числа окна в баре: ниже порога — бледный белый, иначе жёлтый/красный.
+val_color10() {
+  case "$1" in
+    ''|*[!0-9]*) printf '%s' "$C_VAL" ;;
+    *) if [ "$1" -ge "$CRIT_P10" ]; then printf '%s' "$C_VAL_CRIT"
+       elif [ "$1" -ge "$WARN_P10" ]; then printf '%s' "$C_VAL_WARN"
+       else printf '%s' "$C_VAL"; fi ;;
+  esac
+}
+
+# Цвет иконки-чипа в баре: по худшему окну, но приглушённый.
+chip_color10() {
+  case "$1" in
+    ''|*[!0-9]*) printf '%s' "$C_CHIP_OK" ;;
+    *) if [ "$1" -ge "$CRIT_P10" ]; then printf '%s' "$C_CHIP_CRIT"
+       elif [ "$1" -ge "$WARN_P10" ]; then printf '%s' "$C_CHIP_WARN"
+       else printf '%s' "$C_CHIP_OK"; fi ;;
   esac
 }
 
 # Целое неотрицательное?
 is_num() {
   case "$1" in ''|*[!0-9]*) return 1 ;; *) return 0 ;; esac
+}
+
+# microcents -> доллары с двумя знаками.
+usd() { awk -v c="$1" 'BEGIN{ if (c < 0) c = 0; printf "$%.2f", c / 100000000 }'; }
+
+# Десятые доли процента -> строка с одним знаком (4.2).
+pct1() { awk -v p="$1" 'BEGIN{ printf "%.1f", p / 10 }'; }
+
+# Десятые доли процента -> округлённое целое для бара (42 -> 4, 17 -> 2, 8 -> 1).
+pct_int() { printf '%d' "$(( ($1 + 5) / 10 ))"; }
+
+# Эпоха -> дата/время (macOS date -r, иначе GNU date -d).
+fmt_date() {
+  date -r "$1" "$2" 2>/dev/null || date -d "@$1" "$2" 2>/dev/null || printf '?'
 }
 
 # Линейная интерполяция канала: c0 + (c1-c0)*t/steps (целые).
@@ -165,6 +235,12 @@ models_hide() {
   done
 }
 
+# Скрыть прогноз и спарклайн (нет токена, данных или подписки).
+extra_hide() {
+  sb --set "$NAME.forecast" drawing=off
+  sb --set "$NAME.spark" drawing=off
+}
+
 # Показать одну строку-подсказку вместо таблицы.
 models_hint() {
   sb --set "$NAME.models_title" drawing=on label="$1" label.color="$C_HEAD"
@@ -176,17 +252,30 @@ models_hint() {
   done
 }
 
-# --- Обработка мыши: попап открываем/закрываем, данные не перезапрашиваем ---
+# --- Обработка мыши: попап по клику (toggle), данные не перезапрашиваем ---
 case "${SENDER:-routine}" in
-  mouse.entered)
-    sb --set "$NAME" popup.drawing=on
+  mouse.clicked)
+    # Только левая кнопка: правый/средний клик по чипу игнорируем.
+    [ "${BUTTON:-left}" = "left" ] || exit 0
+    # Состояние читаем у SketchyBar, а не храним в файле: так оно не
+    # рассинхронизируется после перезагрузки/перезапуска бара.
+    if [ "$(sketchybar --query "$ROOT" 2>/dev/null \
+            | jq -r '.popup.drawing' 2>/dev/null)" = "on" ]; then
+      sb --set "$ROOT" popup.drawing=off
+    else
+      sb --set "$ROOT" popup.drawing=on
+    fi
     exit 0
     ;;
   mouse.exited.global)
-    sb --set "$NAME" popup.drawing=off
+    sb --set "$ROOT" popup.drawing=off
     exit 0
     ;;
 esac
+
+# Item'ы .r/.w/.m несут скрипт только ради mouse-событий (обработаны выше);
+# их содержимое обновляет основной item opencode_go, routine-опрос им не нужен.
+[ "$NAME" = "$ROOT" ] || exit 0
 
 # --- Учётные данные: env, иначе строка из БД OpenCode (active, integration=opencode) ---
 TOKEN="${OPENCODE_GO_TOKEN:-}"
@@ -203,54 +292,80 @@ fi
 
 if [ -z "$TOKEN" ]; then
   # Нет токена — прячем item, чтобы не мусорить в баре.
-  sb --set "$NAME" drawing=off
-  sb --set "$NAME.burn" drawing=off
+  sb --set "$ROOT" drawing=off
+  sb --set "$ROOT.r" drawing=off
+  sb --set "$ROOT.w" drawing=off
+  sb --set "$ROOT.m" drawing=off
+  sb --set "$ROOT.burn" drawing=off
+  sb --set "$NAME.pace" drawing=off
+  extra_hide
   exit 0
 fi
 
-# --- Данные: свежий кэш или запрос ---
+# --- Статус: свежий кэш или запрос ---
 now="$(date +%s)"
 body=""
 stale=0
-if [ -f "$CACHE" ]; then
-  mt="$(stat -f %m "$CACHE" 2>/dev/null || stat -c %Y "$CACHE" 2>/dev/null || echo 0)"
+if [ -f "$STATUS_CACHE" ]; then
+  mt="$(stat -f %m "$STATUS_CACHE" 2>/dev/null || stat -c %Y "$STATUS_CACHE" 2>/dev/null || echo 0)"
   if [ "$((now - mt))" -lt "$TTL" ] 2>/dev/null; then
-    body="$(cat "$CACHE" 2>/dev/null || true)"
+    body="$(cat "$STATUS_CACHE" 2>/dev/null || true)"
   fi
 fi
 
 if [ -z "$body" ]; then
   if [ -n "$ORG" ]; then
     body="$(curl -fsS -m 10 -H "Authorization: Bearer $TOKEN" -H "x-opencode-org-id: $ORG" \
-      -H "Accept: application/json" "$URL" 2>/dev/null || true)"
+      -H "Accept: application/json" "$STATUS_API" 2>/dev/null || true)"
   else
     body="$(curl -fsS -m 10 -H "Authorization: Bearer $TOKEN" \
-      -H "Accept: application/json" "$URL" 2>/dev/null || true)"
+      -H "Accept: application/json" "$STATUS_API" 2>/dev/null || true)"
   fi
-  if printf '%s' "$body" | jq -e '.usage.rolling.percent != null' >/dev/null 2>&1; then
-    printf '%s' "$body" > "$CACHE" 2>/dev/null || true
+  # Валидный ответ: есть ключ access (null — подписки нет) либо meters.
+  if printf '%s' "$body" | jq -e \
+      'has("access") and (if .access == null then true else (.access.meters.month.usedMicroCents != null) end)' \
+      >/dev/null 2>&1; then
+    printf '%s' "$body" > "$STATUS_CACHE" 2>/dev/null || true
   else
     body=""
   fi
 fi
 
-if [ -z "$body" ] && [ -f "$CACHE" ]; then
-  body="$(cat "$CACHE" 2>/dev/null || true)"
+if [ -z "$body" ] && [ -f "$STATUS_CACHE" ]; then
+  body="$(cat "$STATUS_CACHE" 2>/dev/null || true)"
   stale=1
 fi
 
 if [ -z "$body" ] || ! command -v jq >/dev/null 2>&1; then
-  sb --set "$NAME" drawing=on icon="$ICON_WARN" icon.color="$C_RED" label="n/a" label.color="$C_RED"
+  sb --set "$ROOT" drawing=on icon="$ICON_WARN" icon.color="$C_RED" label.drawing=on label="n/a" label.color="$C_RED"
+  sb --set "$ROOT.r" drawing=off
+  sb --set "$ROOT.w" drawing=off
+  sb --set "$ROOT.m" drawing=off
   sb --set "$NAME.rolling" icon.drawing=off label="Не удалось получить данные OpenCode Go" label.color="$C_RED"
   sb --set "$NAME.weekly" icon.drawing=off label=""
   sb --set "$NAME.monthly" icon.drawing=off label=""
-  sb --set "$NAME.burn" drawing=off
+  sb --set "$NAME.pace" drawing=off
+  sb --set "$ROOT.burn" drawing=off
   models_hide
+  extra_hide
   exit 0
 fi
 
-# --- Парсинг: key <tab> percent <tab> status <tab> reset <tab> countdown <tab> epoch ---
-TAB="$(printf '\t')"
+# Подписки нет — молча скрываем виджет.
+if printf '%s' "$body" | jq -e 'has("access") and .access == null' >/dev/null 2>&1; then
+  sb --set "$ROOT" drawing=off
+  sb --set "$ROOT.r" drawing=off
+  sb --set "$ROOT.w" drawing=off
+  sb --set "$ROOT.m" drawing=off
+  sb --set "$ROOT.burn" drawing=off
+  sb --set "$NAME.pace" drawing=off
+  sb --set "$ROOT" popup.drawing=off
+  models_hide
+  extra_hide
+  exit 0
+fi
+
+# --- Парсинг: key <tab> used <tab> limit <tab> pct10 <tab> reset <tab> countdown <tab> reset_ep <tab> start_ep <tab> access_start ---
 rows="$(printf '%s' "$body" | jq -r --argjson now "$now" '
   def cd($now):
     ((. - $now) | if . < 0 then 0 else . end) as $s
@@ -260,99 +375,101 @@ rows="$(printf '%s' "$body" | jq -r --argjson now "$now" '
     | (if $d>0 then "\($d)d \($h)h"
        elif $h>0 then "\($h)h \($m)m"
        else "\($m)m" end);
-  .usage | to_entries[]
-  | .key as $k | .value as $v
-  | (try (($v.resetsAt // "")
-          | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdateiso8601)
-     catch null) as $ep
+  def ep: (try ((. // "") | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdateiso8601) catch null);
+  (.access.startsAt | ep) as $astart
+  | .access.meters
+  | [ ["rolling", .fiveHour], ["weekly", .week], ["monthly", .month] ][]
+  | .[0] as $k | .[1] as $m
+  | ($m.resetsAt | ep) as $r
+  | ($m.startsAt | ep) as $s
   | [ $k,
-      ($v.percent | tostring),
-      ($v.status // "unknown"),
-      (if $ep == null then "?" else ($ep | localtime | strftime("%d.%m %H:%M")) end),
-      (if $ep == null then "?" else ($ep | cd($now)) end),
-      ($ep // 0)
+      (($m.usedMicroCents // "0") | tonumber),
+      (($m.limitMicroCents // "0") | tonumber),
+      (((($m.usedMicroCents // "0") | tonumber) * 1000 / (($m.limitMicroCents // "1") | tonumber)) | round),
+      (if $r == null then "?" else ($r | localtime | strftime("%d.%m %H:%M")) end),
+      (if $r == null then "?" else ($r | cd($now)) end),
+      ($r // 0),
+      ($s // 0),
+      ($astart // 0)
     ] | @tsv' 2>/dev/null || true)"
 
-R_PCT=""; W_PCT=""; M_PCT=""
-R_ST=""; W_ST=""; M_ST=""
+R_P10=""; W_P10=""; M_P10=""
+R_USED=""; W_USED=""; M_USED=""
+R_LIMIT=""; W_LIMIT=""; M_LIMIT=""
 R_STR=""; W_STR=""; M_STR=""
 R_CD=""; W_CD=""; M_CD=""
 R_EP=""; W_EP=""; M_EP=""
+R_START=""; A_START=""
 
 # POSIX sh: разбираем строки без подоболочки while-в-пайпе.
 old_ifs="$IFS"
 IFS='
 '
 for row in $rows; do
-  IFS="$TAB" read -r key pct status rstr rcd ep <<EOF
+  IFS="$TAB" read -r key used limit pct10 rstr rcd ep start astart <<EOF
 $row
 EOF
+  [ -n "${astart:-}" ] && A_START="$astart"
   case "$key" in
-    rolling) R_PCT="$pct"; R_ST="$status"; R_STR="$rstr"; R_CD="$rcd"; R_EP="$ep" ;;
-    weekly)  W_PCT="$pct"; W_ST="$status"; W_STR="$rstr"; W_CD="$rcd"; W_EP="$ep" ;;
-    monthly) M_PCT="$pct"; M_ST="$status"; M_STR="$rstr"; M_CD="$rcd"; M_EP="$ep" ;;
+    rolling) R_P10="$pct10"; R_USED="$used"; R_LIMIT="$limit"; R_STR="$rstr"; R_CD="$rcd"; R_EP="$ep"; R_START="$start" ;;
+    weekly)  W_P10="$pct10"; W_USED="$used"; W_LIMIT="$limit"; W_STR="$rstr"; W_CD="$rcd"; W_EP="$ep" ;;
+    monthly) M_P10="$pct10"; M_USED="$used"; M_LIMIT="$limit"; M_STR="$rstr"; M_CD="$rcd"; M_EP="$ep" ;;
   esac
 done
 IFS="$old_ifs"
 
-# --- Скорость сжигания 5ч-окна: производная rolling.percent ---
-# rate — %/ч. Считаем наклоном по сэмплам за последние SLOPE_MIN минут; если
-# сэмплов мало — средним темпом с начала окна (resetsAt − 5ч). ratio*1000
-# нормируется на SUSTAIN («устойчивый» темп, он же середина полосы = 1×).
+# --- Скорость сжигания 5ч-окна: средний темп с начала окна ---
+# rate — %/ч. Считаем по точным microcents: elapsed от fiveHour.startsAt.
+# ratio*1000 нормируется на SUSTAIN («устойчивый» темп, середина полосы = 1×).
 burn_rate=""
 ratio_milli=""
 ratio_disp=""
-if [ -n "$R_PCT" ] && is_num "$R_PCT" && is_num "$R_EP" && [ "$R_EP" -gt 0 ] 2>/dev/null; then
-  win_start=$((R_EP - 18000))
-  hdir="${HISTORY%/*}"
-  if [ "$hdir" != "$HISTORY" ] && [ ! -d "$hdir" ]; then mkdir -p "$hdir" 2>/dev/null || true; fi
-  htmp="${HISTORY}.tmp.$$"
-  if printf '' > "$htmp" 2>/dev/null; then
-    # Оставляем только сэмплы текущего окна, затем дописываем текущий.
-    if [ -f "$HISTORY" ]; then
-      awk -F"$TAB" -v win="$R_EP" -v start="$win_start" '
-        NF >= 3 && $1 ~ /^[0-9]+$/ && $3 == win && $1 + 0 >= start { print }
-      ' "$HISTORY" 2>/dev/null > "$htmp"
-    fi
-    printf '%s\t%s\t%s\n' "$now" "$R_PCT" "$R_EP" >> "$htmp"
-
-    burn_rate="$(awk -F"$TAB" -v now="$now" -v smin="$SLOPE_MIN" -v pct="$R_PCT" -v start="$win_start" '
-      { n++; ep[n] = $1 + 0; pp[n] = $2 + 0 }
-      END {
-        idx = 0
-        for (i = 1; i <= n; i++) if (ep[i] >= now - smin * 60) { idx = i; break }
-        r = ""
-        if (idx > 0 && n > idx) {
-          dt = (now - ep[idx]) / 3600
-          if (dt > 0) r = (pct - pp[idx]) / dt
-        }
-        if (r == "" || r < 0) {
-          if (now > start) r = pct / ((now - start) / 3600); else r = pct
-        }
-        if (r < 0) r = 0
-        printf "%.4f", r
-      }' "$htmp" 2>/dev/null)"
-    mv "$htmp" "$HISTORY" 2>/dev/null || rm -f "$htmp" 2>/dev/null || true
-  fi
-
-  if is_num "$SUSTAIN" && [ "$SUSTAIN" -gt 0 ] 2>/dev/null && [ -n "$burn_rate" ]; then
-    ratio_milli="$(awk -v r="$burn_rate" -v s="$SUSTAIN" 'BEGIN{ v=(r/s)*1000; if(v<0)v=0; printf "%d", v }' 2>/dev/null)"
-    ratio_disp="$(awk -v r="$burn_rate" -v s="$SUSTAIN" 'BEGIN{ printf "%.1f", (s>0 ? r/s : 0) }' 2>/dev/null)"
+pace5=""
+hit_ep=""
+if [ -n "$R_P10" ] && is_num "$R_P10" \
+   && is_num "$R_START" && [ "$R_START" -gt 0 ] && is_num "$SUSTAIN" && [ "$SUSTAIN" -gt 0 ]; then
+  burn_data="$(awk -v now="$now" -v start="$R_START" -v p10="$R_P10" -v sus="$SUSTAIN" '
+    BEGIN {
+      el = (now - start) / 3600
+      if (el <= 0 || el < 0.0833) exit
+      p = p10 / 10
+      r = p / el
+      rm = (r / sus) * 1000
+      if (rm < 0) rm = 0
+      f = p * 5 / el
+      hit = (p > 0) ? start + (now - start) * 100 / p : 0
+      printf "%d\t%.2f\t%.2f\t%.1f\t%.0f", rm, r, r / sus, f, hit
+    }' 2>/dev/null)"
+  if [ -n "$burn_data" ]; then
+    IFS="$TAB" read -r ratio_milli burn_rate ratio_disp pace5 hit_ep <<EOF
+$burn_data
+EOF
   fi
 fi
 
 # --- Цвет item'а по худшему из трёх окон ---
 worst=0
-for p in "$R_PCT" "$W_PCT" "$M_PCT"; do
+for p in "$R_P10" "$W_P10" "$M_P10"; do
   case "$p" in ''|*[!0-9]*) continue ;; esac
   [ "$p" -gt "$worst" ] && worst="$p"
 done
-color="$(sev_color "$worst")"
+color="$(chip_color10 "$worst")"
 
-# --- Бар ---
-label="R${R_PCT:-?}% W${W_PCT:-?}% M${M_PCT:-?}%"
-[ "$stale" = "1" ] && label="$label~"
-sb --set "$NAME" drawing=on icon="$ICON_GO" icon.color="$color" label="$label" label.color="$color"
+# --- Бар: иконка-сводка + значения окон по отдельности ---
+# Иконка-чип приглушённо красится по худшему окну. Значения окон — мелкая
+# приглушённая буква окна (иконка) + крупное бледное число без знака %
+# (0..9 с ведущим нулём), подсвечиваемое цветом при достижении порога.
+fmt_pct() {
+  if is_num "$1" && [ "$1" -lt 10 ]; then printf '0%s' "$1"; else printf '%s' "$1"; fi
+}
+
+sb --set "$ROOT" drawing=on icon="$ICON_GO" icon.color="$color" label.drawing=off
+if [ "$stale" = "1" ]; then
+  sb --set "$ROOT" label.drawing=on label="~" label.color="$C_HEAD"
+fi
+sb --set "$ROOT.r" icon.drawing=on icon="R" icon.color="$C_HEAD" label="$(fmt_pct "$(pct_int "${R_P10:-0}")")" label.color="$(val_color10 "${R_P10:-}")"
+sb --set "$ROOT.w" icon.drawing=on icon="W" icon.color="$C_HEAD" label="$(fmt_pct "$(pct_int "${W_P10:-0}")")" label.color="$(val_color10 "${W_P10:-}")"
+sb --set "$ROOT.m" icon.drawing=on icon="M" icon.color="$C_HEAD" label="$(fmt_pct "$(pct_int "${M_P10:-0}")")" label.color="$(val_color10 "${M_P10:-}")"
 
 # --- Полоса скорости сжигания (отдельный item со своим цветом-градиентом) ---
 if [ "$BAR" = "1" ] && [ -n "$ratio_milli" ]; then
@@ -364,112 +481,262 @@ else
 fi
 
 # --- Попап: подробности по каждому окну ---
-status_suffix() {
-  case "$1" in
-    ok|''|unknown) printf '' ;;
-    *) printf ' [%s]' "$1" ;;
-  esac
+# Строка окна: "Rolling:  4.2% · $0.50/$12.00 · reset 26.10 14:26 (2h 58m)".
+window_line() {
+  key_label="$1"; p10="$2"; used="$3"; limit="$4"; rstr="$5"; rcd="$6"
+  p1="$(pct1 "$p10")"
+  u="$(usd "$used")"
+  l="$(usd "$limit")"
+  note=""
+  if [ "$p10" -ge 1000 ] 2>/dev/null; then note=" [limit reached]"; fi
+  printf '%-8s %4s%% · %6s/%-6s · reset %s (%7s)%s' \
+    "$key_label:" "$p1" "$u" "$l" "$rstr" "$rcd" "$note"
 }
 
-if [ -n "$R_PCT" ]; then
-  R_LEFT="$((100 - R_PCT))"
-  R_NOTE=""
-  [ -n "$burn_rate" ] && R_NOTE=" · burn $(printf '%.1f' "$burn_rate")%/h (${ratio_disp}×)"
+if [ -n "$R_P10" ]; then
   sb --set "$NAME.rolling" icon.drawing=off \
-     label="Rolling: ${R_PCT}% used, ${R_LEFT}% left — resets ${R_STR} (in ${R_CD})$(status_suffix "$R_ST")${R_NOTE}" \
-     label.color="$(sev_color "$R_PCT")"
+     label="$(window_line "Rolling" "$R_P10" "$R_USED" "$R_LIMIT" "$R_STR" "$R_CD")" \
+     label.color="$(sev_color10 "$R_P10")"
 fi
-if [ -n "$W_PCT" ]; then
-  W_LEFT="$((100 - W_PCT))"
+if [ -n "$W_P10" ]; then
   sb --set "$NAME.weekly" icon.drawing=off \
-     label="Weekly: ${W_PCT}% used, ${W_LEFT}% left — resets ${W_STR} (in ${W_CD})$(status_suffix "$W_ST")" \
-     label.color="$(sev_color "$W_PCT")"
+     label="$(window_line "Weekly" "$W_P10" "$W_USED" "$W_LIMIT" "$W_STR" "$W_CD")" \
+     label.color="$(sev_color10 "$W_P10")"
 fi
-if [ -n "$M_PCT" ]; then
-  M_LEFT="$((100 - M_PCT))"
+if [ -n "$M_P10" ]; then
   sb --set "$NAME.monthly" icon.drawing=off \
-     label="Monthly: ${M_PCT}% used, ${M_LEFT}% left — resets ${M_STR} (in ${M_CD})$(status_suffix "$M_ST")" \
-     label.color="$(sev_color "$M_PCT")"
+     label="$(window_line "Monthly" "$M_P10" "$M_USED" "$M_LIMIT" "$M_STR" "$M_CD")" \
+     label.color="$(sev_color10 "$M_P10")"
 fi
 
-# --- Попап: Usage by Model (только Console Usage API, service-account ключ) ---
-# Считается на сервере, поэтому учитывает использование с других устройств.
-if [ -z "$SA_KEY" ]; then
-  models_hint "Usage by Model — задай OPENCODE_GO_SA_KEY"
+# --- Попап: темп 5ч-окна ---
+pace_parts=""
+pace_color="$C_HEAD"
+if [ -n "$burn_rate" ] && [ "$R_P10" -gt 0 ] 2>/dev/null; then
+  if [ -n "$hit_ep" ] && [ "$hit_ep" -gt 0 ] 2>/dev/null && [ "$hit_ep" -lt "$R_EP" ] 2>/dev/null; then
+    pace_parts="5h ${burn_rate}%/h (${ratio_disp}×) → 100% ~$(fmt_date "$hit_ep" +%H:%M)"
+    pace_color="$C_YELLOW"
+  else
+    pace_parts="5h ${burn_rate}%/h (${ratio_disp}×) → ${pace5}% by reset"
+    [ "$ratio_milli" -ge 1500 ] 2>/dev/null && pace_color="$C_YELLOW"
+  fi
+fi
+if [ -n "$pace_parts" ]; then
+  sb --set "$NAME.pace" drawing=on label="Pace: $pace_parts" label.color="$pace_color"
 else
-  # CSV из usage/export, с кэшем на MODELS_TTL секунд.
-  csv=""
-  if [ -f "$USAGE_CACHE" ]; then
-    mt="$(stat -f %m "$USAGE_CACHE" 2>/dev/null || stat -c %Y "$USAGE_CACHE" 2>/dev/null || echo 0)"
-    if [ "$((now - mt))" -lt "$MODELS_TTL" ] 2>/dev/null; then
-      csv="$(cat "$USAGE_CACHE" 2>/dev/null || true)"
+  sb --set "$NAME.pace" drawing=off
+fi
+
+# --- Попап: прогноз месяца к дате продления ---
+# Формула как на странице Console → Go: линейная экстраполяция процента
+# месячного лимита от access.startsAt до month.resetsAt. Как и на сайте,
+# прогноз не показываем, пока с начала периода не прошли сутки.
+fc_data=""
+if [ -n "$M_P10" ] && is_num "$M_P10" && [ "$M_P10" -gt 0 ] \
+   && is_num "$M_USED" && is_num "$M_LIMIT" && [ "$M_LIMIT" -gt 0 ] \
+   && is_num "$A_START" && [ "$A_START" -gt 0 ] && is_num "$M_EP" && [ "$M_EP" -gt 0 ] \
+   && [ "$A_START" -lt "$M_EP" ]; then
+  fc_data="$(awk -v used="$M_USED" -v limit="$M_LIMIT" -v start="$A_START" -v end="$M_EP" -v now="$now" '
+    BEGIN {
+      el = now - start
+      if (el < 86400) exit
+      p = used * 100 / limit
+      span = end - start
+      f = p * span / el
+      hit = (p > 0) ? start + el * 100 / p : 0
+      usd = used * span / el
+      per = p * 86400 / el
+      printf "%d\t%.0f\t%.0f\t%.2f", int(f * 10 + 0.5), hit, usd, per
+    }' 2>/dev/null)"
+fi
+
+F_P10=""; F_HIT=""; F_USD=""; F_PER=""
+if [ -n "$fc_data" ]; then
+  IFS="$TAB" read -r F_P10 F_HIT F_USD F_PER <<EOF
+$fc_data
+EOF
+fi
+
+F_LABEL=""; F_COLOR="$C_HEAD"
+if [ -n "$F_P10" ]; then
+  if [ "$M_USED" -ge "$M_LIMIT" ] 2>/dev/null; then
+    F_LABEL="Forecast: monthly limit reached"
+    F_COLOR="$C_RED"
+  elif [ "$F_P10" -ge 1000 ]; then
+    F_LABEL="Forecast: on pace to hit 100% $(fmt_date "$F_HIT" +%d.%m) · $(pct1 "$F_P10")% by $(fmt_date "$M_EP" +%d.%m)"
+    F_COLOR="$C_RED"
+  else
+    F_LABEL="Forecast: $(pct1 "$F_P10")% by $(fmt_date "$M_EP" +%d.%m) · $(usd "$F_USD") of $(usd "$M_LIMIT")"
+    [ "$F_P10" -ge "$WARN_P10" ] && F_COLOR="$C_YELLOW"
+  fi
+  sb --set "$NAME.forecast" drawing=on label="$F_LABEL" label.color="$F_COLOR"
+else
+  sb --set "$NAME.forecast" drawing=off
+fi
+
+# --- Попап: спарклайн дневного расхода за текущий период Go ---
+# Console Activity API отдаёт дневные суммы, но они могут не совпадать со
+# счётчиком месяца (скидки/льготы), поэтому, как и сайт, нормируем их на
+# текущий процент месячного лимита.
+abody=""
+if [ "$SPARK" = "1" ]; then
+  if [ -f "$ACTIVITY_CACHE" ]; then
+    mt="$(stat -f %m "$ACTIVITY_CACHE" 2>/dev/null || stat -c %Y "$ACTIVITY_CACHE" 2>/dev/null || echo 0)"
+    if [ "$((now - mt))" -lt "$ACTIVITY_TTL" ] 2>/dev/null; then
+      abody="$(cat "$ACTIVITY_CACHE" 2>/dev/null || true)"
     fi
   fi
-  if [ -z "$csv" ]; then
-    resp="$(curl -sS -m 30 -w '\n%{http_code}' -H "Authorization: Bearer $SA_KEY" -H "Accept: text/csv" \
-      --get "$CONSOLE_URL/api/v1/usage/export" \
-      --data-urlencode scope=organization --data-urlencode range="$USAGE_RANGE" 2>/dev/null || true)"
-    http="$(printf '%s' "$resp" | tail -n 1)"
-    csv="$(printf '%s' "$resp" | sed '$d')"
-    first="$(printf '%s\n' "$csv" | head -n 1 | tr -d '\r')"
-    case "$http:$first" in
-      200:*model*) printf '%s\n' "$csv" > "$USAGE_CACHE" 2>/dev/null || true ;;
-      200:*) csv=""; hint="Usage by Model — пустой ответ API (200)" ;;
-      401:*) csv=""; hint="Usage by Model — ключ отклонён (401)" ;;
-      403:*) csv=""; hint="Usage by Model — 403: нет права читать usage" ;;
-      400:*) csv=""; hint="Usage by Model — неверные параметры (400)" ;;
-      "")    csv=""; hint="Usage by Model — нет соединения с API" ;;
-      *)     csv=""; hint="Usage by Model — API вернул $http" ;;
-    esac
+  if [ -z "$abody" ]; then
+    if [ -n "$ORG" ]; then
+      abody="$(curl -fsS -m 15 -H "Authorization: Bearer $TOKEN" -H "x-opencode-org-id: $ORG" \
+        -H "Accept: application/json" "$ACTIVITY_API" 2>/dev/null || true)"
+    else
+      abody="$(curl -fsS -m 15 -H "Authorization: Bearer $TOKEN" \
+        -H "Accept: application/json" "$ACTIVITY_API" 2>/dev/null || true)"
+    fi
+    if printf '%s' "$abody" | jq -e '(.daily | type) == "array"' >/dev/null 2>&1; then
+      printf '%s\n' "$abody" > "$ACTIVITY_CACHE" 2>/dev/null || true
+    else
+      abody=""
+    fi
   fi
+  if [ -z "$abody" ] && [ -f "$ACTIVITY_CACHE" ]; then
+    abody="$(cat "$ACTIVITY_CACHE" 2>/dev/null || true)"
+  fi
+fi
 
-  if [ -z "$csv" ]; then
-    models_hint "${hint:-Usage by Model — нет данных API}"
+adaily=""
+if [ "$SPARK" = "1" ] && [ -n "$abody" ] && [ -n "$M_P10" ] && is_num "$M_P10" \
+   && [ "$M_P10" -gt 0 ] && is_num "$M_USED" && is_num "$M_LIMIT" && [ "$M_LIMIT" -gt 0 ] \
+   && is_num "$A_START" && [ "$A_START" -gt 0 ] \
+   && is_num "$M_EP" && [ "$M_EP" -gt 0 ]; then
+  adaily="$(printf '%s' "$abody" | jq -r \
+    '(.daily // [])[] | [.date, ((.totalCostMicroCents // "0") | tonumber)] | @tsv' 2>/dev/null || true)"
+fi
+
+spark=""
+if [ -n "$adaily" ]; then
+  spark="$(printf '%s\n' "$adaily" | awk -F'\t' \
+    -v used="$M_USED" -v limit="$M_LIMIT" -v start="$A_START" -v end="$M_EP" -v now="$now" -v glyphs="$SPARK_GLYPHS" '
+    { n++; c[n] = $2 + 0; sum += $2 + 0 }
+    END {
+      p = used * 100 / limit
+      if (n == 0 || sum <= 0 || p <= 0) exit
+      split(glyphs, G, " ")
+      avg = (now > start) ? p * 86400 / (now - start) : 0
+      max = 0
+      for (i = 1; i <= n; i++) { v[i] = p * c[i] / sum; if (v[i] > max) max = v[i] }
+      scale = 2 * avg
+      if (max > scale) scale = max
+      if (scale <= 0) scale = max
+      bars = ""
+      for (i = 1; i <= n; i++) {
+        lvl = int(v[i] * 7 / scale + 0.5) + 1
+        if (lvl > 8) lvl = 8
+        if (lvl < 1) lvl = 1
+        bars = bars G[lvl]
+      }
+      days = (end - start) / 86400
+      printf "%s\t%.1f\t%d\t%.0f", bars, avg, n, days
+    }' 2>/dev/null)"
+fi
+
+S_BARS=""; S_AVG=""; S_N=""; S_DAYS=""
+if [ -n "$spark" ]; then
+  IFS="$TAB" read -r S_BARS S_AVG S_N S_DAYS <<EOF
+$spark
+EOF
+fi
+
+if [ -n "$S_BARS" ]; then
+  slabel="Daily: $S_BARS"
+  # Средний темп имеет смысл только после суток — как и прогноз.
+  [ -n "$F_PER" ] && [ -n "$S_AVG" ] && slabel="$slabel  avg ${S_AVG}%/day"
+  [ -n "$S_DAYS" ] && [ "$S_DAYS" -gt 0 ] 2>/dev/null && slabel="$slabel · $S_N of $S_DAYS days"
+  sb --set "$NAME.spark" drawing=on label="$slabel" label.color="$C_VAL"
+else
+  sb --set "$NAME.spark" drawing=off
+fi
+
+# --- Попап: Usage by Model (Console Usage API, JSON) ---
+# Данные серверные, поэтому учитывается использование с любого устройства.
+# CSV-экспорт больше не используется: usage/models отдаёт те же агрегаты
+# (cost в microcents), но без SA-ключа и без разбора CSV.
+mbody=""
+hint=""
+if [ -f "$MODELS_CACHE" ]; then
+  mt="$(stat -f %m "$MODELS_CACHE" 2>/dev/null || stat -c %Y "$MODELS_CACHE" 2>/dev/null || echo 0)"
+  if [ "$((now - mt))" -lt "$MODELS_TTL" ] 2>/dev/null; then
+    mbody="$(cat "$MODELS_CACHE" 2>/dev/null || true)"
+  fi
+fi
+
+if [ -z "$mbody" ]; then
+  if [ -n "$ORG" ]; then
+    resp="$(curl -sS -m 30 -w '\n%{http_code}' -H "Authorization: Bearer $TOKEN" \
+      -H "x-opencode-org-id: $ORG" -H "Accept: application/json" \
+      --get "$MODELS_API" --data-urlencode "range=$USAGE_RANGE" --data-urlencode "pageSize=100" \
+      2>/dev/null || true)"
   else
-    # Агрегация по (provider, model):
-    # provider<TAB>model<TAB>req<TAB>in<TAB>cacheRead<TAB>cacheWrite<TAB>out<TAB>cost<TAB>tokens
-    # Колонки CSV: cost_micro_cents (÷1e8), cache_write_5m_tokens + cache_write_1h_tokens.
-    raw="$(printf '%s\n' "$csv" | awk -F',' -v div="$COST_DIV" '
-      function clean(s){ gsub(/\r$/, "", s); gsub(/^[ \t]+|[ \t]+$/, "", s); if (s ~ /^".*"$/) s = substr(s, 2, length(s) - 2); return s }
-      NR == 1 {
-        for (i = 1; i <= NF; i++) { h = tolower(clean($i)); col[h] = i }
-        ci = col["input_tokens"]; if (!ci) ci = col["input"]
-        co = col["output_tokens"]; if (!co) co = col["output"]
-        cr = col["cache_read_tokens"]; if (!cr) cr = col["cache_read"]; if (!cr) cr = col["cached_tokens"]
-        cw5 = col["cache_write_5m_tokens"]; cw1 = col["cache_write_1h_tokens"]
-        cw = col["cache_write_tokens"]; if (!cw) cw = col["cache_write"]
-        ccm = col["cost_micro_cents"]; cc = col["cost"]
-        cm = col["model"]; cp = col["provider"]
-        next
-      }
-      {
-        m = (cm ? clean($cm) : ""); if (m == "") next
-        p = (cp ? clean($cp) : "")
-        k = p SUBSEP m
-        req[k]++
-        if (ci) inp[k] += clean($ci) + 0
-        if (co) outp[k] += clean($co) + 0
-        if (cr) crd[k] += clean($cr) + 0
-        if (cw5 || cw1) { if (cw5) cwr[k] += clean($cw5) + 0; if (cw1) cwr[k] += clean($cw1) + 0 }
-        else if (cw) cwr[k] += clean($cw) + 0
-        if (ccm) { v = clean($ccm) + 0; cst[k] += v; tot += v }
-        else if (cc) { v = clean($cc); if (v ~ /\./) dot = 1; cst[k] += v + 0; tot += v + 0 }
-      }
-      END {
-        if (div == "auto") d = ccm ? 100000000 : ((dot == 0 && tot >= 1000000) ? 100000000 : 1)
-        else d = div + 0
-        if (d <= 0) d = 1
-        for (k in req) {
-          split(k, a, SUBSEP)
-          tok = inp[k] + crd[k] + cwr[k] + outp[k]
-          printf "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%.8f\t%d\n", a[1], a[2], req[k], inp[k], crd[k], cwr[k], outp[k], cst[k] / d, tok
-        }
-      }')"
+    resp="$(curl -sS -m 30 -w '\n%{http_code}' -H "Authorization: Bearer $TOKEN" \
+      -H "Accept: application/json" \
+      --get "$MODELS_API" --data-urlencode "range=$USAGE_RANGE" --data-urlencode "pageSize=100" \
+      2>/dev/null || true)"
+  fi
+  http="$(printf '%s' "$resp" | tail -n 1)"
+  mbody="$(printf '%s' "$resp" | sed '$d')"
+  case "$http" in
+    200)
+      if printf '%s' "$mbody" | jq -e '(.items | type) == "array"' >/dev/null 2>&1; then
+        printf '%s\n' "$mbody" > "$MODELS_CACHE" 2>/dev/null || true
+      else
+        mbody=""; hint="Usage by Model — неожиданный ответ API"
+      fi
+      ;;
+    401) mbody=""; hint="Usage by Model — токен отклонён (401)" ;;
+    403) mbody=""; hint="Usage by Model — 403: нет доступа к usage" ;;
+    400) mbody=""; hint="Usage by Model — неверный range (400)" ;;
+    000|"") mbody=""; hint="Usage by Model — нет соединения с API" ;;
+    *)   mbody=""; hint="Usage by Model — API вернул $http" ;;
+  esac
+fi
+
+# Протухший кэш лучше пустоты: показываем последние удачные данные.
+if [ -z "$mbody" ] && [ -f "$MODELS_CACHE" ]; then
+  mbody="$(cat "$MODELS_CACHE" 2>/dev/null || true)"
+  hint=""
+fi
+
+if [ -z "$mbody" ]; then
+  models_hint "${hint:-Usage by Model — нет данных API}"
+else
+  # Агрегация по (provider, model):
+  # provider<TAB>model<TAB>req<TAB>in<TAB>cacheRead<TAB>cacheWrite<TAB>out<TAB>costMicroCents<TAB>tokens
+  raw="$(printf '%s' "$mbody" | jq -r '
+    def num: (. // 0) | tonumber;
+    .items[]
+    | [ .provider, .model,
+        (.totalRequests | num),
+        (.totalInputTokens | num),
+        (.totalCacheReadTokens | num),
+        (((.totalCacheWrite5mTokens | num) + (.totalCacheWrite1hTokens | num))),
+        (.totalOutputTokens | num),
+        (.totalCostMicroCents | num),
+        (((.totalInputTokens | num) + (.totalCacheReadTokens | num)
+          + (.totalCacheWrite5mTokens | num) + (.totalCacheWrite1hTokens | num)
+          + (.totalOutputTokens | num)))
+      ] | @tsv' 2>/dev/null || true)"
+
+  if [ -z "$raw" ]; then
+    models_hint "Usage by Model — пусто за $USAGE_RANGE"
+  else
+    total_req="$(printf '%s\n' "$raw" | awk -F'\t' '{ s += $3 } END { print s + 0 }')"
 
     # Сортировка по стоимости, при нулевой стоимости — по объёму токенов.
-    rows="$(printf '%s\n' "$raw" | sort -t"$TAB" -k8,8nr -k9,9nr | head -n "$MODELS_LIMIT" | grep -v '^$' || true)"
+    mrows="$(printf '%s\n' "$raw" | sort -t"$TAB" -k8,8nr -k9,9nr \
+      | head -n "$MODELS_LIMIT" | grep -v '^$' || true)"
 
-    if [ -z "$rows" ]; then
+    if [ -z "$mrows" ]; then
       models_hint "Usage by Model — пусто за $USAGE_RANGE"
     else
       # Имена моделей из публичного каталога models.dev (кэш 24 ч).
@@ -485,11 +752,23 @@ else
         fi
       fi
 
-      sb --set "$NAME.models_title" drawing=on label="Usage by Model · $USAGE_RANGE" label.color="$C_HEAD"
+      # Доля топ-модели по запросам (как «Most used this period» в консоли).
+      top_provider="$(printf '%s\n' "$mrows" | head -n 1 | cut -f1)"
+      top_model="$(printf '%s\n' "$mrows" | head -n 1 | cut -f2)"
+      top_req="$(printf '%s\n' "$mrows" | head -n 1 | cut -f3)"
+      top_name="$(awk -F'\t' -v p="$top_provider" -v m="$top_model" '
+        { key = $1 SUBSEP $2; if (!(key in nm)) nm[key] = $3; if (!($2 in glob)) glob[$2] = $3 }
+        END { n = nm[p SUBSEP m]; if (n == "") n = glob[m]; if (n == "") n = m; print n }' "$NAMES_TSV" 2>/dev/null)"
+      [ -n "$top_name" ] || top_name="$top_model"
+      share="$(awk -v r="$top_req" -v t="$total_req" 'BEGIN { if (t <= 0) print 0; else printf "%d", r * 100 / t + 0.5 }')"
+
+      models_title="Usage by Model · $USAGE_RANGE"
+      [ "$total_req" -gt 0 ] 2>/dev/null && models_title="$models_title · top: $top_name ${share}%"
+      sb --set "$NAME.models_title" drawing=on label="$models_title" label.color="$C_HEAD"
       sb --set "$NAME.model_head" drawing=on label.color="$C_HEAD" \
         label="$(printf "%-${NAME_W}s %6s %8s %8s %8s %8s %8s" "Model" "Req" "In" "CacheR" "CacheW" "Out" "Cost")"
 
-      labels="$(printf '%s\n' "$rows" | awk -F'\t' -v w="$NAME_W" -v pf="$NAMES_TSV" '
+      labels="$(printf '%s\n' "$mrows" | awk -F'\t' -v w="$NAME_W" -v pf="$NAMES_TSV" '
         BEGIN {
           while ((getline line < pf) > 0) {
             n = split(line, f, "\t")
@@ -500,7 +779,7 @@ else
           }
         }
         function fmt(x){ if (x == "" || x + 0 == 0) return "-"; if (x + 0 >= 1000000) return sprintf("%.1fM", x / 1000000); if (x + 0 >= 1000) return sprintf("%.1fk", x / 1000); return sprintf("%d", x) }
-        function money(c){ if (c + 0 <= 0) return "$0.00"; if (c + 0 < 0.01) return "<$0.01"; return sprintf("$%.2f", c) }
+        function money(c){ c = c / 100000000; if (c <= 0) return "$0.00"; if (c < 0.01) return "<$0.01"; return sprintf("$%.2f", c) }
         {
           name = nm[$1 SUBSEP $2]; if (name == "") name = glob[$2]; if (name == "") name = $2
           if (length(name) > w) name = substr(name, 1, w)
